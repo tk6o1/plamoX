@@ -1,0 +1,2283 @@
+# PLAMOX — Firebase セットアップガイド
+
+アカウント作成・投稿機能を動かすまでの手順です。
+
+---
+
+## ⏱ 所要時間: 約15〜20分
+
+---
+
+## STEP 1 — Firebase プロジェクト作成
+
+1. **https://console.firebase.google.com** にアクセス
+2. **「プロジェクトを作成」** をクリック
+3. プロジェクト名: `plamox`（好きな名前でOK）
+4. Google アナリティクスは任意 → 「プロジェクトを作成」
+
+---
+
+## STEP 2 — ウェブアプリを登録
+
+1. プロジェクトのホーム画面で **`</>`** （ウェブ）アイコンをクリック
+2. アプリ名: `plamox-web`
+3. 「Firebase Hosting も設定する」は**チェックしない**
+4. **「アプリを登録」** → 表示される `firebaseConfig` をコピー
+
+```javascript
+// こんな形のものが表示されます
+const firebaseConfig = {
+  apiKey: "AIza...",
+  authDomain: "plamox-xxxxx.firebaseapp.com",
+  projectId: "plamox-xxxxx",
+  storageBucket: "plamox-xxxxx.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+```
+
+5. この値を **`config.js`** に貼り付ける（後述）
+
+---
+
+## STEP 3 — Authentication を有効化
+
+1. 左メニュー **「Authentication」** → **「始める」**
+2. **「Sign-in method」** タブ
+
+以下を**有効化**:
+
+| プロバイダ | 設定方法 |
+|---|---|
+| **メール/パスワード** | クリックして「有効にする」→ 保存 |
+| **Google** | クリックして「有効にする」→ プロジェクトのサポートメールを選択 → 保存 |
+| **Twitter** | ※下記の追加手順参照 |
+
+### Twitter (X) の設定
+
+1. **https://developer.twitter.com** でアプリを作成
+2. App settings → Keys and tokens から `API Key` と `API Secret` をコピー
+3. Firebase Console の Twitter プロバイダに貼り付け
+4. Firebase が表示する**コールバックURL**をTwitter Appの設定に追加
+
+---
+
+## STEP 4 — Firestore Database を有効化
+
+1. 左メニュー **「Firestore Database」** → **「データベースの作成」**
+2. **「本番環境モードで開始」** を選択
+3. ロケーション: `asia-northeast1`（東京）推奨 → **「有効にする」**
+4. **「ルール」** タブを開き、以下のルールに**置き換えて保存**:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users: 本人のみ書き込み可、全員読み取り可
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Posts: ログイン済みユーザーが作成可、本人のみ削除可
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+    }
+  }
+}
+```
+
+---
+
+## STEP 5 — Storage を有効化
+
+1. 左メニュー **「Storage」** → **「始める」**
+2. **「本番環境モードで開始」**
+3. ロケーション: Firestore と同じリージョン → **「完了」**
+4. **「ルール」** タブを開き、以下に置き換えて保存:
+
+```
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /posts/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
+```
+
+---
+
+## STEP 6 — config.js を編集
+
+`config.js` ファイルを開き、STEP 2 でコピーした値を貼り付けます:
+
+```javascript
+const FIREBASE_CONFIG = {
+  apiKey:            "AIza...",          // ← あなたの値
+  authDomain:        "plamox-xxxxx.firebaseapp.com",
+  projectId:         "plamox-xxxxx",
+  storageBucket:     "plamox-xxxxx.appspot.com",
+  messagingSenderId: "123456789",
+  appId:             "1:123456789:web:abcdef",
+};
+```
+
+---
+
+## STEP 7 — GitHub Pages にデプロイ
+
+```bash
+# リポジトリ作成・プッシュ
+git init
+git add .
+git commit -m "PLAMOX v2 - Firebase integration"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/plamox.git
+git push -u origin main
+```
+
+GitHub リポジトリ → **Settings → Pages → Source: main / (root)** → Save
+
+数分後に `https://YOUR_USERNAME.github.io/plamox/` で公開されます。
+
+---
+
+## ✅ 動作確認チェックリスト
+
+- [ ] `https://YOUR_USERNAME.github.io/plamox/` を開く
+- [ ] 「LOGIN / SIGN UP」→ メールで新規登録できる
+- [ ] Google ログインができる
+- [ ] 「＋ POST」で写真と情報を入力し投稿できる
+- [ ] フィードに投稿が表示される
+- [ ] ⚡ GP ボタンでポイントを送れる
+- [ ] 🏴 FLAG ボタンで国旗を送れる
+
+---
+
+## 🆘 よくあるエラー
+
+| エラー | 対処 |
+|---|---|
+| `auth/unauthorized-domain` | Firebase Console → Authentication → Settings → 承認済みドメインに GitHub Pages の URL を追加 |
+| `storage/unauthorized` | Storage のルールを確認 |
+| `Missing or insufficient permissions` | Firestore のルールを確認 |
+| Twitter が動かない | コールバック URL の設定を確認 |
+
+---
+
+*PLAMOX — Built with Firebase × Claude*
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#04060a"/>
+  <rect x="0" y="0" width="512" height="4" fill="#00e5ff" opacity="0.6"/>
+  <rect x="0" y="508" width="512" height="4" fill="#00e5ff" opacity="0.6"/>
+  <rect x="0" y="0" width="4" height="512" fill="#00e5ff" opacity="0.6"/>
+  <rect x="508" y="0" width="4" height="512" fill="#00e5ff" opacity="0.6"/>
+  <!-- Corner cuts -->
+  <polygon points="0,0 60,0 0,60" fill="#00e5ff" opacity="0.7"/>
+  <polygon points="512,0 452,0 512,60" fill="#00e5ff" opacity="0.7"/>
+  <polygon points="0,512 60,512 0,452" fill="#39ff90" opacity="0.6"/>
+  <polygon points="512,512 452,512 512,452" fill="#9b59ff" opacity="0.5"/>
+  <!-- PLAMOX text -->
+  <text x="256" y="230" font-family="Arial Black, sans-serif" font-weight="900" font-size="110" fill="#ccd8f0" text-anchor="middle" letter-spacing="6">PLAMO</text>
+  <text x="256" y="340" font-family="Arial Black, sans-serif" font-weight="900" font-size="140" fill="#00e5ff" text-anchor="middle" letter-spacing="8">X</text>
+  <!-- Tagline -->
+  <text x="256" y="400" font-family="Arial, sans-serif" font-size="24" fill="#445566" text-anchor="middle" letter-spacing="4">WHERE YOUR BUILD MEETS</text>
+  <text x="256" y="430" font-family="Arial, sans-serif" font-size="24" fill="#445566" text-anchor="middle" letter-spacing="4">THE WORLD</text>
+  <!-- Glow line -->
+  <line x1="100" y1="460" x2="412" y2="460" stroke="#00e5ff" stroke-width="2" opacity="0.4"/>
+</svg>
+
+// ============================================================
+//  PLAMOX — Firebase Configuration
+//  Firebase Console でプロジェクト作成後、
+//  ここに YOUR プロジェクトの設定を貼り付けてください。
+//  https://console.firebase.google.com/
+// ============================================================
+
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyAjcuF4aVQkkghXj-LFDPS-bx7RqH2KhAk",
+  authDomain:        "plamoxofficial.firebaseapp.com",
+  projectId:         "plamoxofficial",
+  storageBucket:     "plamoxofficial.firebasestorage.app",
+  messagingSenderId: "883989210611",
+  appId:             "1:883989210611:web:aaac9d84f07af09ac51e86",
+  measurementId:     "G-VZ6ZWZJNP7"
+};
+
+// Twitter/X Provider を使う場合 → Firebase Console > Authentication >
+// Sign-in method > Twitter を有効化し、API Key / Secret を入力してください。
+
+export default FIREBASE_CONFIG;
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users: 本人のみ書き込み可、全員読み取り可
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // Posts: ログイン済みが作成・更新可、本人のみ削除可
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+    }
+  }
+}
+
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "*.rules",
+      "SETUP.md",
+      "generate_ogp.py",
+      "node_modules/**",
+      ".git/**"
+    ],
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|html)",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|png|webp|gif|ico|svg)",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+      }
+    ]
+  }
+}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLAMOX — Where Your Build Meets the World</title>
+<meta name="description" content="世界中のモデラーが作品を見せ合い、国旗でリスペクトを送るグローバル模型SNS。">
+<meta name="theme-color" content="#04060a">
+<meta property="og:title" content="PLAMOX — Where Your Build Meets the World">
+<meta property="og:description" content="Build · Share · Connect — グローバル模型コミュニティ">
+<meta property="og:image" content="https://plamoxofficial.web.app/ogp.png">
+<meta property="og:url" content="https://plamoxofficial.web.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://plamoxofficial.web.app/ogp.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2304060a'/><text x='50%' y='55%' font-family='Arial Black' font-weight='900' font-size='14' fill='%2300e5ff' text-anchor='middle' dominant-baseline='middle'>PX</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   PLAMOX — Design System (Mecha / Game Dark UI)
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:#04060a; --bg2:#080c12; --bg3:#0d1320; --bg4:#12192a;
+  --ink:#ccd8f0; --ink2:#8899bb; --muted:#445566;
+  --border:#162030; --border2:#1e3048;
+  --accent:#00e5ff; --accent2:#0088bb;
+  --green:#39ff90; --purple:#9b59ff; --warm:#ff4d1a; --gold:#ffc840;
+  --font-head:'Orbitron',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --clip-sm: polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  --clip-md: polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+  --clip-lg: polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);background:var(--bg);color:var(--ink);
+  min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,229,255,0.025) 40px),
+             repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,229,255,0.015) 40px);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,229,255,0.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  background:rgba(4,6,10,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border2);
+}
+nav::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--green),var(--purple),transparent);
+  opacity:0.4;
+}
+.nav-logo{
+  font-family:var(--font-head);font-size:17px;font-weight:900;
+  color:var(--ink);letter-spacing:3px;cursor:pointer;user-select:none;
+}
+.nav-logo span{color:var(--accent)}
+.nav-tagline{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-left:14px}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nav-link{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--ink2);padding:6px 12px;cursor:pointer;
+  border:1px solid transparent;transition:all 0.2s;text-transform:uppercase;
+  clip-path:var(--clip-sm);
+}
+.nav-link:hover,.nav-link.active{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.06)}
+.nav-right{display:flex;align-items:center;gap:10px}
+
+/* GP Badge in nav */
+.nav-gp{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:9px;color:var(--gold);
+  background:rgba(255,200,64,0.08);border:1px solid rgba(255,200,64,0.2);
+  padding:5px 10px;clip-path:var(--clip-sm);
+}
+.nav-gp-num{font-size:12px;font-weight:700}
+
+/* Auth button */
+.btn-auth{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:7px 16px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+}
+.btn-auth:hover{background:#33eeff;box-shadow:0 0 16px rgba(0,229,255,0.4)}
+
+.btn-post{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--bg);background:var(--green);border:none;cursor:pointer;
+  padding:7px 14px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+}
+.btn-post:hover{background:#5fffaa;box-shadow:0 0 16px rgba(57,255,144,0.4)}
+
+/* Avatar */
+.nav-avatar{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--accent);cursor:pointer;
+  object-fit:cover;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;overflow:hidden;
+}
+
+/* Lang switcher */
+.lang-switcher{position:relative}
+.lang-btn-main{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);
+  padding:5px 8px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.lang-btn-main:hover{color:var(--accent);border-color:rgba(0,229,255,0.3)}
+.lang-arrow{transition:transform 0.2s;font-size:8px}
+.lang-switcher.open .lang-arrow{transform:rotate(180deg)}
+.lang-dropdown{
+  position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--bg3);border:1px solid var(--border2);
+  padding:4px;min-width:170px;z-index:300;display:none;
+  clip-path:var(--clip-md);box-shadow:0 16px 40px rgba(0,0,0,0.7);
+}
+.lang-switcher.open .lang-dropdown{display:block;animation:fadeIn 0.15s ease}
+.lang-option{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  font-family:var(--font-mono);font-size:10px;color:var(--ink2);cursor:pointer;transition:background 0.15s;
+}
+.lang-option:hover{background:var(--bg4);color:var(--accent)}
+.lang-option.active{background:rgba(0,229,255,0.1);color:var(--accent)}
+.lang-native{color:var(--muted);font-size:9px;margin-left:auto}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-top:56px;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ── FEED PAGE ── */
+.feed-layout{
+  display:grid;grid-template-columns:1fr 320px;
+  gap:28px;max-width:1100px;margin:0 auto;padding:24px 28px 60px;
+}
+.feed-main{}
+.feed-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.feed-title{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px}
+.feed-sort{display:flex;gap:6px}
+.sort-btn{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:1px;
+  color:var(--muted);background:transparent;border:1px solid var(--border);
+  padding:4px 8px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.sort-btn.active,.sort-btn:hover{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.05)}
+
+/* ── POST CARD ── */
+.post{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);margin-bottom:16px;position:relative;overflow:hidden;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.post:hover{border-color:rgba(0,229,255,0.2);box-shadow:0 0 24px rgba(0,229,255,0.06)}
+.post::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--green));opacity:0.5;
+}
+.post-img-wrap{position:relative;width:100%;padding-top:56.25%;overflow:hidden;background:var(--bg3)}
+.post-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.post-img-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,0) 4px);
+  pointer-events:none;
+}
+.post-no-img{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-size:32px;color:rgba(0,229,255,0.15);letter-spacing:4px;
+}
+.post-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.post-user{display:flex;align-items:center;gap:10px}
+.post-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;
+}
+.post-avatar img{width:100%;height:100%;object-fit:cover}
+.post-username{font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.5px}
+.post-flag-origin{font-size:14px;margin-left:2px}
+.post-time{font-family:var(--font-mono);font-size:9px;color:var(--muted)}
+.post-body{padding:4px 16px 12px}
+.post-work-title{font-family:var(--font-head);font-size:13px;color:var(--ink);letter-spacing:1px;margin-bottom:6px}
+.post-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.post-tag{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:1px;
+  color:var(--muted);background:var(--bg3);border:1px solid var(--border);
+  padding:2px 6px;clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,0 100%);
+}
+.post-tag.scale{color:var(--green);border-color:rgba(57,255,144,0.2);background:rgba(57,255,144,0.05)}
+.post-tag.cat{color:var(--purple);border-color:rgba(155,89,255,0.2);background:rgba(155,89,255,0.05)}
+.post-desc{font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:8px}
+.post-point{
+  font-size:11px;color:var(--ink);background:rgba(0,229,255,0.05);
+  border-left:2px solid var(--accent);padding:6px 10px;margin-bottom:10px;
+  font-style:italic;
+}
+
+/* Likes from countries */
+.post-fr{padding:8px 16px;border-top:1px solid var(--border)}
+.post-fr-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:6px}
+.fr-flags{display:flex;flex-wrap:wrap;gap:4px}
+.fr-flag{
+  font-size:12px;background:var(--bg3);border:1px solid var(--border);
+  padding:2px 6px;border-radius:2px;cursor:default;
+  font-family:var(--font-mono);font-size:9px;display:flex;align-items:center;gap:3px;color:var(--ink2);
+}
+.fr-count{color:var(--accent);font-size:8px}
+
+/* Post actions */
+.post-actions{
+  padding:8px 12px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.action-btn{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border);
+  padding:5px 10px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.action-btn:hover{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.05)}
+.action-btn.liked{color:var(--gold);border-color:rgba(255,200,64,0.3);background:rgba(255,200,64,0.05)}
+.action-btn .icon{font-size:12px}
+.action-count{color:var(--accent);font-size:10px;font-weight:700}
+.btn-send-flag{
+  margin-left:auto;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:5px 12px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+}
+.btn-send-flag:hover{background:#33eeff;box-shadow:0 0 12px rgba(0,229,255,0.4)}
+
+/* Empty feed state */
+.feed-empty{
+  text-align:center;padding:80px 20px;
+  font-family:var(--font-mono);color:var(--muted);font-size:11px;letter-spacing:2px;
+}
+.feed-empty-icon{font-size:48px;margin-bottom:16px;opacity:0.3}
+.feed-loading{
+  text-align:center;padding:60px 20px;
+  font-family:var(--font-mono);color:var(--accent);font-size:10px;letter-spacing:3px;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px;align-self:start}
+.widget{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:16px;position:relative;
+}
+.widget::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--green),var(--purple));opacity:0.5;
+}
+.widget-title{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:2px;
+  color:var(--muted);margin-bottom:14px;text-transform:uppercase;
+}
+
+/* GP widget */
+.gp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.gp-label{font-family:var(--font-mono);font-size:10px;color:var(--ink2)}
+.gp-num{font-family:var(--font-head);font-size:20px;color:var(--gold)}
+.gp-bar-wrap{background:var(--bg3);border:1px solid var(--border);height:6px;border-radius:0;overflow:hidden;position:relative}
+.gp-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--gold),#ffaa00);
+  transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 8px rgba(255,200,64,0.6);
+}
+.gp-sub{font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:6px;letter-spacing:1px}
+
+/* Active countries */
+.active-country{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);cursor:default}
+.active-country:last-child{border-bottom:none}
+.ac-flag{font-size:16px}
+.ac-name{font-family:var(--font-mono);font-size:9px;color:var(--ink2);flex:1;letter-spacing:0.5px}
+.ac-count{font-family:var(--font-mono);font-size:9px;color:var(--accent)}
+
+/* ── RANKING PAGE ── */
+.ranking-layout{max-width:800px;margin:0 auto;padding:32px 28px 60px}
+.page-title{
+  font-family:var(--font-head);font-size:22px;color:var(--ink);letter-spacing:3px;
+  margin-bottom:8px;
+}
+.page-sub{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:28px}
+.rank-tabs{display:flex;gap:4px;margin-bottom:24px}
+.rank-tab{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border);
+  padding:8px 16px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;text-transform:uppercase;
+}
+.rank-tab.active,.rank-tab:hover{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.06)}
+.rank-item{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:14px 18px;margin-bottom:8px;
+  display:flex;align-items:center;gap:16px;transition:all 0.2s;cursor:pointer;
+}
+.rank-item:hover{border-color:rgba(0,229,255,0.2);background:var(--bg3)}
+.rank-item.gold{border-color:rgba(255,200,64,0.4);box-shadow:0 0 16px rgba(255,200,64,0.1)}
+.rank-num{
+  font-family:var(--font-head);font-size:22px;color:var(--muted);
+  width:36px;text-align:center;letter-spacing:0;
+}
+.rank-item.gold .rank-num{color:var(--gold)}
+.rank-thumb{
+  width:56px;height:40px;background:var(--bg3);border:1px solid var(--border);
+  object-fit:cover;flex-shrink:0;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+}
+.rank-thumb img{width:100%;height:100%;object-fit:cover}
+.rank-info{flex:1}
+.rank-name{font-family:var(--font-head);font-size:11px;color:var(--ink);letter-spacing:1px;margin-bottom:3px}
+.rank-user{font-family:var(--font-mono);font-size:9px;color:var(--accent)}
+.rank-right{text-align:right}
+.rank-gp{font-family:var(--font-head);font-size:20px;color:var(--accent)}
+.rank-gp-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px}
+
+/* ── PROFILE PAGE ── */
+.profile-hero{
+  background:var(--bg2);border-bottom:1px solid var(--border2);
+  padding:36px 28px 0;position:relative;
+}
+.profile-hero::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.3;
+}
+.profile-top{display:flex;align-items:flex-start;gap:20px;max-width:900px;margin:0 auto}
+.profile-avatar-lg{
+  width:80px;height:80px;border-radius:50%;
+  border:2px solid var(--accent);background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  flex-shrink:0;overflow:hidden;box-shadow:0 0 24px rgba(0,229,255,0.2);
+}
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover}
+.profile-info{flex:1}
+.profile-name{font-family:var(--font-head);font-size:18px;color:var(--ink);letter-spacing:2px;margin-bottom:4px}
+.profile-handle{font-family:var(--font-mono);font-size:10px;color:var(--accent);margin-bottom:6px}
+.profile-bio{font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:12px}
+.profile-stat-row{display:flex;gap:0;margin-top:4px}
+.profile-stat-row > div{
+  padding:8px 20px;border-right:1px solid var(--border);text-align:center;
+}
+.profile-stat-row > div:first-child{padding-left:0}
+.pstat-num{font-family:var(--font-head);font-size:18px;color:var(--accent)}
+.pstat-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+.profile-tabs{
+  display:flex;gap:0;max-width:900px;margin:20px auto 0;
+  border-bottom:1px solid var(--border);
+}
+.ptab{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--ink2);padding:12px 24px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;
+}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ptab:hover{color:var(--accent)}
+.profile-content{max-width:900px;margin:0 auto;padding:24px 28px 60px}
+.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.work-thumb{
+  aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);
+  cursor:pointer;overflow:hidden;position:relative;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
+  transition:all 0.2s;
+}
+.work-thumb:hover{border-color:rgba(0,229,255,0.3);transform:scale(1.02)}
+.work-thumb img{width:100%;height:100%;object-fit:cover}
+.work-thumb-empty{
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;opacity:0.2;
+}
+.work-thumb-overlay{
+  position:absolute;inset:0;background:rgba(4,6,10,0.7);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  opacity:0;transition:opacity 0.2s;
+  font-family:var(--font-mono);font-size:9px;color:var(--accent);
+}
+.work-thumb:hover .work-thumb-overlay{opacity:1}
+
+/* Flag collection */
+.flags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.flag-cell{
+  aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  cursor:default;transition:all 0.2s;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%);
+}
+.flag-cell.collected{border-color:rgba(0,229,255,0.2);background:rgba(0,229,255,0.04)}
+.flag-cell.collected:hover{background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,0.4)}
+.flag-cell .fc-flag{font-size:20px}
+.flag-cell .fc-count{font-family:var(--font-mono);font-size:7px;color:var(--accent)}
+.flag-cell.locked{opacity:0.2;filter:grayscale(1)}
+
+/* Achievements */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.ach-card{
+  background:var(--bg3);border:1px solid var(--border);
+  clip-path:var(--clip-md);overflow:hidden;position:relative;
+}
+.ach-mosaic{
+  height:70px;overflow:hidden;position:relative;
+  display:flex;flex-wrap:wrap;
+}
+.ach-mosaic-flag{font-size:22px;line-height:1.2;filter:brightness(0.6)}
+.ach-mosaic-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,var(--bg3) 100%);
+}
+.ach-num{
+  position:absolute;bottom:4px;right:8px;
+  font-family:var(--font-head);font-size:28px;color:var(--accent);opacity:0.9;
+}
+.ach-info{padding:10px 12px}
+.ach-name{font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;color:var(--ink2);margin-bottom:2px}
+.ach-desc{font-size:10px;color:var(--muted)}
+.ach-card.locked{opacity:0.4;filter:grayscale(0.6)}
+.ach-card.unlocked .ach-name{color:var(--green)}
+
+/* ── ABOUT PAGE ── */
+.about-wrap{max-width:720px;margin:0 auto;padding:60px 28px 80px}
+.about-title{font-family:var(--font-head);font-size:clamp(28px,5vw,44px);color:var(--ink);letter-spacing:2px;margin-bottom:8px}
+.about-accent{color:var(--accent)}
+.about-sub{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:3px;margin-bottom:40px}
+.about-section{margin-bottom:40px}
+.about-section-title{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--accent);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.about-section-title::before{content:'';display:block;width:24px;height:1px;background:var(--accent)}
+.about-body{font-size:13px;color:var(--ink2);line-height:1.8}
+.about-values{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.av{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:16px;
+}
+.av-icon{font-size:24px;margin-bottom:8px}
+.av-title{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;color:var(--ink);margin-bottom:4px}
+.av-desc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ── MODALS ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  clip-path:var(--clip-lg);
+  width:100%;max-width:540px;max-height:90vh;overflow-y:auto;
+  position:relative;
+}
+.modal-header{
+  padding:20px 24px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--bg2);z-index:10;
+}
+.modal-header::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--accent),var(--green));opacity:0.4;
+}
+.modal-title{font-family:var(--font-head);font-size:14px;color:var(--ink);letter-spacing:2px}
+.modal-close{
+  background:transparent;border:none;color:var(--muted);cursor:pointer;
+  font-size:18px;padding:4px 8px;transition:color 0.2s;
+}
+.modal-close:hover{color:var(--accent)}
+.modal-body{padding:20px 24px 24px}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:18px}
+.form-label{
+  display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--muted);margin-bottom:6px;text-transform:uppercase;
+}
+.form-input,.form-textarea,.form-select{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--ink);font-family:var(--font-body);font-size:13px;
+  padding:10px 12px;outline:none;transition:border-color 0.2s;
+  clip-path:var(--clip-sm);
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:rgba(0,229,255,0.5);box-shadow:0 0 0 2px rgba(0,229,255,0.1)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-select{cursor:pointer;appearance:none}
+.form-hint{font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:4px;letter-spacing:0.5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-error{font-family:var(--font-mono);font-size:9px;color:var(--warm);margin-top:4px}
+
+/* Image upload zone */
+.upload-zone{
+  border:2px dashed var(--border2);background:var(--bg3);
+  padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;
+  clip-path:var(--clip-md);
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(0,229,255,0.04)}
+.upload-zone-icon{font-size:32px;margin-bottom:8px;opacity:0.5}
+.upload-zone-text{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px}
+.upload-preview{position:relative;width:100%;padding-top:40%;overflow:hidden}
+.upload-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.upload-preview-remove{
+  position:absolute;top:8px;right:8px;
+  background:rgba(255,77,26,0.8);border:none;color:white;
+  padding:4px 8px;cursor:pointer;font-size:10px;
+  clip-path:var(--clip-sm);
+}
+
+/* Submit buttons */
+.btn-submit{
+  width:100%;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:12px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+  text-transform:uppercase;
+}
+.btn-submit:hover{background:#33eeff;box-shadow:0 0 20px rgba(0,229,255,0.4)}
+.btn-submit:disabled{opacity:0.4;cursor:not-allowed}
+.btn-outline{
+  width:100%;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);cursor:pointer;
+  padding:12px;clip-path:var(--clip-sm);transition:all 0.2s;margin-top:8px;
+}
+.btn-outline:hover{color:var(--accent);border-color:rgba(0,229,255,0.4)}
+
+/* Auth divider */
+.auth-divider{
+  display:flex;align-items:center;gap:12px;margin:16px 0;
+  font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:2px;
+}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Social auth buttons */
+.btn-social{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;
+  color:var(--ink);background:var(--bg3);border:1px solid var(--border2);cursor:pointer;
+  padding:11px;clip-path:var(--clip-sm);transition:all 0.2s;margin-bottom:8px;
+}
+.btn-social:hover{border-color:rgba(0,229,255,0.3);background:var(--bg4)}
+.btn-social-icon{font-size:16px}
+
+/* Auth tabs */
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.auth-tab{
+  flex:1;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--ink2);padding:10px;cursor:pointer;text-align:center;
+  border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;
+}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── TAGS INPUT ── */
+.tags-wrap{
+  display:flex;flex-wrap:wrap;gap:4px;align-items:center;
+  background:var(--bg3);border:1px solid var(--border2);
+  padding:6px;clip-path:var(--clip-sm);min-height:40px;
+}
+.tag-chip{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);
+  padding:2px 6px;font-family:var(--font-mono);font-size:9px;color:var(--accent);
+  clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,0 100%);
+}
+.tag-chip-remove{cursor:pointer;color:var(--muted);font-size:10px;padding:0 2px}
+.tag-chip-remove:hover{color:var(--warm)}
+.tags-input{
+  background:transparent;border:none;outline:none;
+  color:var(--ink);font-family:var(--font-body);font-size:13px;
+  flex:1;min-width:80px;padding:2px 4px;
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--bg3);border:1px solid var(--border2);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--accent);
+  padding:10px 20px;clip-path:var(--clip-md);z-index:9999;
+  opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--bg2) 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);padding:56px 28px 48px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(0,229,255,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:4px;margin-bottom:12px}
+.hero-title{
+  font-family:var(--font-head);font-size:clamp(36px,6vw,64px);
+  color:var(--ink);letter-spacing:2px;line-height:1.1;margin-bottom:8px;
+}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:3px;margin-bottom:32px}
+.hero-flags{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:32px}
+.hero-flag{
+  width:40px;height:40px;border-radius:50%;background:var(--bg3);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-size:20px;transition:transform 0.2s;
+}
+.hero-flag:hover{transform:scale(1.2)}
+.hero-stats{display:flex;justify-content:center;gap:0;max-width:400px;margin:0 auto;border:1px solid var(--border);clip-path:var(--clip-md)}
+.hero-stats > div{flex:1;padding:16px 0;text-align:center;border-right:1px solid var(--border)}
+.hero-stats > div:last-child{border-right:none}
+.hstat-num{font-family:var(--font-head);font-size:24px;color:var(--accent)}
+.hstat-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none}
+@media(max-width:600px){
+  .mobile-nav{
+    display:flex!important;position:fixed;bottom:0;left:0;right:0;z-index:100;
+    background:rgba(4,6,10,0.97);border-top:1px solid var(--border2);height:56px;
+  }
+  .mobile-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;cursor:pointer;background:transparent;border:none;
+    color:var(--muted);font-family:var(--font-mono);font-size:7px;letter-spacing:1px;
+    text-transform:uppercase;padding:8px 0;transition:color 0.2s;
+  }
+  .mobile-nav-item.active{color:var(--accent)}
+  .mobile-nav-item .mn-icon{font-size:17px}
+  nav{padding:0 14px;height:50px}
+  .nav-tagline{display:none}
+  .nav-links{display:none}
+  .page{padding-top:50px;padding-bottom:56px}
+  .feed-layout{grid-template-columns:1fr;padding:12px;gap:0}
+  .sidebar{display:none}
+  .ranking-layout,.about-wrap{padding:20px 14px 80px}
+  .profile-hero{padding:24px 14px 0}
+  .profile-content{padding:16px 14px 80px}
+  .profile-top{flex-direction:column;align-items:center;text-align:center}
+  .hero{padding:40px 14px 36px}
+  .about-values{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .works-grid{grid-template-columns:repeat(3,1fr);gap:3px}
+}
+@media(max-width:900px){
+  .feed-layout{grid-template-columns:1fr;padding:16px 20px 80px}
+  .sidebar{display:none}
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.post{animation:slideUp 0.3s ease both}
+
+/* Delete confirm */
+.btn-danger{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--warm);background:transparent;border:1px solid rgba(255,77,26,0.4);
+  padding:6px 12px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-danger:hover{background:rgba(255,77,26,0.1)}
+
+/* Spinner */
+.spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid var(--border2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Counter badge */
+.counter-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;padding:0 4px;
+  background:var(--accent);color:var(--bg);
+  font-family:var(--font-mono);font-size:9px;font-weight:700;
+  border-radius:2px;margin-left:4px;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav id="mainNav">
+  <div style="display:flex;align-items:center;">
+    <div class="nav-logo" onclick="showPage('home')">PLAMO<span>X</span></div>
+    <div class="nav-tagline">Build · Share · Connect</div>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active" id="nl-home"    onclick="showPage('home')">Feed</div>
+    <div class="nav-link"        id="nl-ranking" onclick="showPage('ranking')">Ranking</div>
+    <div class="nav-link"        id="nl-profile" onclick="showPage('profile')">Profile</div>
+    <div class="nav-link"        id="nl-about"   onclick="showPage('about')">About</div>
+  </div>
+  <div class="nav-right">
+    <!-- Lang -->
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn-main" onclick="toggleLang()">
+        <span id="langFlag">🇯🇵</span>
+        <span id="langCode">JA</span>
+        <span class="lang-arrow">▾</span>
+      </button>
+      <div class="lang-dropdown" id="langDropdown"></div>
+    </div>
+    <!-- GP (shown when logged in) -->
+    <div class="nav-gp" id="navGP" style="display:none">
+      <span>⚡</span>
+      <span class="nav-gp-num" id="navGPNum">5</span>
+      <span style="font-size:8px;color:var(--muted)">GP</span>
+    </div>
+    <!-- Auth area -->
+    <div id="navAuthArea">
+      <button class="btn-auth" onclick="openModal('authModal')">LOGIN / SIGN UP</button>
+    </div>
+    <!-- Post button (shown when logged in) -->
+    <button class="btn-post" id="btnPost" style="display:none" onclick="openModal('postModal')">＋ POST</button>
+  </div>
+</nav>
+
+<!-- ══════════════════ PAGES ══════════════════ -->
+
+<!-- HOME / FEED -->
+<div class="page active" id="page-home">
+  <!-- Hero (shown when not logged in) -->
+  <div class="hero" id="heroSection">
+    <div class="hero-eyebrow">GLOBAL MODEL COMMUNITY</div>
+    <div class="hero-title">WHERE YOUR BUILD<br>MEETS THE <span>WORLD</span></div>
+    <div class="hero-sub">Build · Share · Connect</div>
+    <div class="hero-flags" id="heroFlags"></div>
+    <div class="hero-stats">
+      <div><div class="hstat-num" id="statPosts">—</div><div class="hstat-label">WORKS</div></div>
+      <div><div class="hstat-num" id="statUsers">—</div><div class="hstat-label">BUILDERS</div></div>
+      <div><div class="hstat-num" id="statCountries">—</div><div class="hstat-label">COUNTRIES</div></div>
+    </div>
+  </div>
+
+  <div class="feed-layout">
+    <div class="feed-main">
+      <div class="feed-header">
+        <span class="feed-title" id="feedTitle">LATEST BUILDS</span>
+        <div class="feed-sort">
+          <button class="sort-btn active" onclick="setSort('new',this)">NEW</button>
+          <button class="sort-btn" onclick="setSort('top',this)">TOP</button>
+        </div>
+      </div>
+      <div id="feedContainer">
+        <div class="feed-loading">LOADING BUILDS...</div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <!-- GP widget -->
+      <div class="widget" id="gpWidget" style="display:none">
+        <div class="widget-title">⚡ DAILY G-POINTS</div>
+        <div class="gp-row">
+          <span class="gp-label">REMAINING</span>
+          <span class="gp-num" id="gpNum">5</span>
+        </div>
+        <div class="gp-bar-wrap"><div class="gp-bar-fill" id="gpBar" style="width:100%"></div></div>
+        <div class="gp-sub" id="gpSub">5 / 5 GP TODAY</div>
+      </div>
+      <!-- Active countries -->
+      <div class="widget">
+        <div class="widget-title">🌍 ACTIVE COUNTRIES</div>
+        <div id="activeCountries"></div>
+      </div>
+      <!-- Global Supporters -->
+      <div class="widget">
+        <div class="widget-title">🏆 TOP BUILDERS</div>
+        <div id="topBuilders"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RANKING -->
+<div class="page" id="page-ranking">
+  <div class="ranking-layout">
+    <div class="page-title">GLOBAL RANKING</div>
+    <div class="page-sub">TOP BUILDERS FROM AROUND THE WORLD</div>
+    <div class="rank-tabs">
+      <button class="rank-tab active" onclick="setRankTab('works',this)">🏆 WORKS</button>
+      <button class="rank-tab" onclick="setRankTab('countries',this)">🌍 COUNTRIES</button>
+      <button class="rank-tab" onclick="setRankTab('flags',this)">🏴 MOST FLAGS</button>
+    </div>
+    <div id="rankingContainer"><div class="feed-loading">LOADING...</div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="page-profile">
+  <div id="profileNotLoggedIn" style="text-align:center;padding:100px 20px">
+    <div style="font-size:48px;margin-bottom:16px;opacity:0.3">👤</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:20px">LOGIN TO VIEW YOUR PROFILE</div>
+    <button class="btn-auth" onclick="openModal('authModal')">LOGIN / SIGN UP</button>
+  </div>
+  <div id="profileLoggedIn" style="display:none">
+    <div class="profile-hero">
+      <div class="profile-top">
+        <div class="profile-avatar-lg" id="profileAvatar">👤</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-handle" id="profileHandle">@—</div>
+          <div class="profile-bio" id="profileBio"></div>
+          <div class="profile-stat-row">
+            <div><div class="pstat-num" id="pstatWorks">0</div><div class="pstat-label">WORKS</div></div>
+            <div><div class="pstat-num" id="pstatGP">0</div><div class="pstat-label">TOTAL GP</div></div>
+            <div><div class="pstat-num" id="pstatCountries">0</div><div class="pstat-label">COUNTRIES</div></div>
+          </div>
+        </div>
+        <button class="btn-outline" style="width:auto;padding:6px 14px;margin-top:0" onclick="openModal('editProfileModal')">✏ EDIT</button>
+      </div>
+      <div class="profile-tabs">
+        <div class="ptab active" onclick="setPTab('builds',this)">BUILDS</div>
+        <div class="ptab" onclick="setPTab('flags',this)">COUNTRIES</div>
+        <div class="ptab" onclick="setPTab('achievements',this)">ACHIEVEMENTS</div>
+      </div>
+    </div>
+    <div class="profile-content">
+      <div id="ptab-builds"></div>
+      <div id="ptab-flags" style="display:none"></div>
+      <div id="ptab-achievements" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="about-wrap">
+    <div class="about-title">WHERE YOUR BUILD<br>MEETS THE <span class="about-accent">WORLD</span></div>
+    <div class="about-sub">PLAMOX — GLOBAL MODEL COMMUNITY</div>
+    <div class="about-section">
+      <div class="about-section-title">CONCEPT</div>
+      <div class="about-body">PLAMOXは、世界中のモデラーが作品を通じて繋がるためのSNSです。売買や商業取引はありません。あるのは、純粋なリスペクトと国境を越えた評価だけ。</div>
+    </div>
+    <div class="about-section">
+      <div class="about-section-title">HOW IT WORKS</div>
+      <div class="about-body">毎日5GPが配布されます。気に入った作品にGPを送ることで、その作者を応援できます。また、自分の国の国旗スタンプを投稿に送ることで「あなたの作品は私の国にも届いている」というメッセージを伝えることができます。</div>
+    </div>
+    <div class="about-values">
+      <div class="av"><div class="av-icon">⚡</div><div class="av-title">G-POINTS</div><div class="av-desc">毎日5GP。ポイントで作品を応援する。</div></div>
+      <div class="av"><div class="av-icon">🏴</div><div class="av-title">FLAG STAMPS</div><div class="av-desc">国旗で国境を越えたリスペクトを送る。</div></div>
+      <div class="av"><div class="av-icon">🌍</div><div class="av-title">GLOBAL REACH</div><div class="av-desc">何カ国に届いたか可視化される達成感。</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">ACCOUNT</span>
+      <button class="modal-close" onclick="closeModal('authModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="setAuthTab('login')">LOGIN</div>
+        <div class="auth-tab" onclick="setAuthTab('signup')">SIGN UP</div>
+      </div>
+      <!-- Social -->
+      <button class="btn-social" onclick="authWithGoogle()">
+        <span class="btn-social-icon">🔵</span> Continue with Google
+      </button>
+      <button class="btn-social" onclick="authWithTwitter()">
+        <span class="btn-social-icon">𝕏</span> Continue with X (Twitter)
+      </button>
+      <div class="auth-divider">OR</div>
+      <!-- Email form -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+          <div class="form-error" id="loginError"></div>
+        </div>
+        <button class="btn-submit" onclick="emailLogin()">LOGIN</button>
+      </div>
+      <div id="signupForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label">DISPLAY NAME</label>
+          <input class="form-input" type="text" id="signupName" placeholder="YourBuildName">
+        </div>
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input class="form-input" type="email" id="signupEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input class="form-input" type="password" id="signupPassword" placeholder="8+ characters">
+          <div class="form-error" id="signupError"></div>
+        </div>
+        <button class="btn-submit" onclick="emailSignup()">CREATE ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <span class="modal-title">NEW BUILD</span>
+      <button class="modal-close" onclick="closeModal('postModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Image upload -->
+      <div class="form-group">
+        <label class="form-label">PHOTO *</label>
+        <div id="uploadZone" class="upload-zone" onclick="document.getElementById('imgFileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="handleImgDrop(event)">
+          <div class="upload-zone-icon">📷</div>
+          <div class="upload-zone-text">CLICK OR DRAG & DROP</div>
+          <div class="upload-zone-text" style="color:var(--muted);font-size:8px;margin-top:4px">JPG / PNG / WEBP · MAX 5MB</div>
+        </div>
+        <div id="uploadPreview" style="display:none" class="upload-preview">
+          <img id="previewImg" src="">
+          <button class="upload-preview-remove" onclick="removeImg()">✕ REMOVE</button>
+        </div>
+        <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="handleImgSelect(event)">
+      </div>
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label">WORK TITLE *</label>
+        <input class="form-input" type="text" id="postTitle" placeholder="e.g. RX-78 DEEP CHROME CUSTOM" maxlength="80">
+      </div>
+      <div class="form-row">
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label">CATEGORY *</label>
+          <select class="form-select" id="postCategory">
+            <option value="">-- SELECT --</option>
+            <option value="gunpla">Gunpla</option>
+            <option value="figure">Figure</option>
+            <option value="vehicle">Vehicle</option>
+            <option value="aircraft">Aircraft</option>
+            <option value="ship">Ship / Naval</option>
+            <option value="diorama">Diorama</option>
+            <option value="sci-fi">Sci-Fi</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <!-- Scale -->
+        <div class="form-group">
+          <label class="form-label">SCALE</label>
+          <select class="form-select" id="postScale">
+            <option value="">-- NONE --</option>
+            <option value="1/144">1/144</option>
+            <option value="1/100">1/100</option>
+            <option value="HG">HG</option>
+            <option value="MG">MG</option>
+            <option value="PG">PG</option>
+            <option value="RG">RG</option>
+            <option value="1/35">1/35</option>
+            <option value="1/48">1/48</option>
+            <option value="1/72">1/72</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">DESCRIPTION</label>
+        <textarea class="form-textarea" id="postDesc" placeholder="制作の背景や工程など..." maxlength="500" rows="3"></textarea>
+      </div>
+      <!-- Key point -->
+      <div class="form-group">
+        <label class="form-label">こだわりポイント ✦</label>
+        <input class="form-input" type="text" id="postPoint" placeholder="特にアピールしたいこと" maxlength="120">
+        <div class="form-hint">This is highlighted prominently on your post</div>
+      </div>
+      <!-- Tags -->
+      <div class="form-group">
+        <label class="form-label">TAGS</label>
+        <div class="tags-wrap" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+          <input class="tags-input" id="tagInput" placeholder="Type & press Enter" maxlength="20"
+                 onkeydown="handleTagInput(event)">
+        </div>
+        <div class="form-hint">Press Enter to add each tag · Max 8 tags</div>
+      </div>
+      <div class="form-error" id="postError"></div>
+      <button class="btn-submit" id="btnSubmitPost" onclick="submitPost()">PUBLISH BUILD</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">EDIT PROFILE</span>
+      <button class="modal-close" onclick="closeModal('editProfileModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">DISPLAY NAME</label>
+        <input class="form-input" type="text" id="editName" maxlength="40">
+      </div>
+      <div class="form-group">
+        <label class="form-label">BIO</label>
+        <textarea class="form-textarea" id="editBio" rows="3" maxlength="200" placeholder="Tell the world about your builds..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">COUNTRY</label>
+        <select class="form-select" id="editCountry"></select>
+      </div>
+      <div class="form-error" id="editProfileError"></div>
+      <button class="btn-submit" onclick="saveProfile()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL MODAL -->
+<div class="modal-overlay" id="postDetailModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <span class="modal-title" id="detailTitle">—</span>
+      <button class="modal-close" onclick="closeModal('postDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-item active" id="mn-home" onclick="showPage('home');mnActive('mn-home')"><span class="mn-icon">⚡</span><span>FEED</span></button>
+  <button class="mobile-nav-item" id="mn-ranking" onclick="showPage('ranking');mnActive('mn-ranking')"><span class="mn-icon">🏆</span><span>RANK</span></button>
+  <button class="mobile-nav-item" id="mn-profile" onclick="showPage('profile');mnActive('mn-profile')"><span class="mn-icon">👤</span><span>MINE</span></button>
+  <button class="mobile-nav-item" id="mn-about" onclick="showPage('about');mnActive('mn-about')"><span class="mn-icon">◈</span><span>INFO</span></button>
+</nav>
+
+<!-- Firebase SDK (ESM via CDN) -->
+<script type="module">
+// ═══════════════════════════════════════════════════════
+//  PLAMOX — Firebase Integration
+//  Replace FIREBASE_CONFIG values in config.js
+// ═══════════════════════════════════════════════════════
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, TwitterAuthProvider, signInWithPopup, updateProfile }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit, where, serverTimestamp, increment, runTransaction, writeBatch }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+// ── CONFIG ─────────────────────────────────────────────
+// Load from config.js — user fills in their Firebase project values
+let FIREBASE_CONFIG;
+try {
+  const mod = await import('./config.js');
+  FIREBASE_CONFIG = mod.default;
+} catch(e) {
+  // Demo mode: no Firebase config found
+  console.warn('[PLAMOX] config.js not found — running in demo mode');
+  FIREBASE_CONFIG = null;
+}
+
+// ── INIT ───────────────────────────────────────────────
+let app, auth, db, storage;
+let currentUser = null;
+let userData    = null; // Firestore user doc
+
+if (FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+  app     = initializeApp(FIREBASE_CONFIG);
+  auth    = getAuth(app);
+  db      = getFirestore(app);
+  storage = getStorage(app);
+  window._db = db; // expose for debug
+} else {
+  // Demo mode banner
+  document.body.insertAdjacentHTML('afterbegin',
+    `<div style="position:fixed;top:56px;left:0;right:0;z-index:500;background:rgba(255,200,64,0.12);border-bottom:1px solid rgba(255,200,64,0.3);padding:7px 20px;text-align:center;font-family:var(--font-mono);font-size:9px;color:var(--gold);letter-spacing:2px">
+      ⚠ DEMO MODE — config.js の Firebase設定を入力すると実際のデータが使えます
+    </div>`
+  );
+}
+
+// ── CONSTANTS ─────────────────────────────────────────
+const GP_PER_DAY = 5;
+const COUNTRIES = [
+  {code:'JP',flag:'🇯🇵',name:'Japan'},      {code:'US',flag:'🇺🇸',name:'USA'},
+  {code:'KR',flag:'🇰🇷',name:'Korea'},      {code:'CN',flag:'🇨🇳',name:'China'},
+  {code:'DE',flag:'🇩🇪',name:'Germany'},    {code:'FR',flag:'🇫🇷',name:'France'},
+  {code:'GB',flag:'🇬🇧',name:'UK'},         {code:'IT',flag:'🇮🇹',name:'Italy'},
+  {code:'BR',flag:'🇧🇷',name:'Brazil'},     {code:'AU',flag:'🇦🇺',name:'Australia'},
+  {code:'CA',flag:'🇨🇦',name:'Canada'},     {code:'ES',flag:'🇪🇸',name:'Spain'},
+  {code:'MX',flag:'🇲🇽',name:'Mexico'},     {code:'IN',flag:'🇮🇳',name:'India'},
+  {code:'ID',flag:'🇮🇩',name:'Indonesia'},  {code:'TH',flag:'🇹🇭',name:'Thailand'},
+  {code:'PH',flag:'🇵🇭',name:'Philippines'},{code:'TW',flag:'🇹🇼',name:'Taiwan'},
+  {code:'SG',flag:'🇸🇬',name:'Singapore'},  {code:'HK',flag:'🇭🇰',name:'Hong Kong'},
+  {code:'RU',flag:'🇷🇺',name:'Russia'},     {code:'PL',flag:'🇵🇱',name:'Poland'},
+  {code:'NL',flag:'🇳🇱',name:'Netherlands'},{code:'SE',flag:'🇸🇪',name:'Sweden'},
+  {code:'NO',flag:'🇳🇴',name:'Norway'},     {code:'FI',flag:'🇫🇮',name:'Finland'},
+  {code:'DK',flag:'🇩🇰',name:'Denmark'},    {code:'CH',flag:'🇨🇭',name:'Switzerland'},
+  {code:'AT',flag:'🇦🇹',name:'Austria'},    {code:'NZ',flag:'🇳🇿',name:'New Zealand'},
+  {code:'ZA',flag:'🇿🇦',name:'South Africa'},{code:'NG',flag:'🇳🇬',name:'Nigeria'},
+  {code:'EG',flag:'🇪🇬',name:'Egypt'},      {code:'SA',flag:'🇸🇦',name:'Saudi Arabia'},
+  {code:'AR',flag:'🇦🇷',name:'Argentina'},  {code:'CL',flag:'🇨🇱',name:'Chile'},
+  {code:'CO',flag:'🇨🇴',name:'Colombia'},   {code:'PT',flag:'🇵🇹',name:'Portugal'},
+  {code:'GR',flag:'🇬🇷',name:'Greece'},     {code:'TR',flag:'🇹🇷',name:'Türkiye'},
+  {code:'UA',flag:'🇺🇦',name:'Ukraine'},    {code:'CZ',flag:'🇨🇿',name:'Czechia'},
+  {code:'HU',flag:'🇭🇺',name:'Hungary'},    {code:'RO',flag:'🇷🇴',name:'Romania'},
+  {code:'MY',flag:'🇲🇾',name:'Malaysia'},   {code:'VN',flag:'🇻🇳',name:'Vietnam'},
+  {code:'PK',flag:'🇵🇰',name:'Pakistan'},   {code:'BD',flag:'🇧🇩',name:'Bangladesh'},
+  {code:'IR',flag:'🇮🇷',name:'Iran'},       {code:'IQ',flag:'🇮🇶',name:'Iraq'},
+];
+const countryMap = Object.fromEntries(COUNTRIES.map(c => [c.code, c]));
+function getCountryFlag(code){ return countryMap[code]?.flag || '🌐' }
+function getCountryName(code){ return countryMap[code]?.name || code }
+
+// ── I18N ──────────────────────────────────────────────
+const LANGS = {
+  ja:{code:'JA',flag:'🇯🇵',name:'日本語',t:{nav_feed:'フィード',nav_ranking:'ランキング',nav_profile:'プロフィール',tagline:'Build · Share · Connect',sort_new:'新着',sort_top:'人気',login:'ログイン / 登録'}},
+  en:{code:'EN',flag:'🇺🇸',name:'English',t:{nav_feed:'Feed',nav_ranking:'Ranking',nav_profile:'Profile',tagline:'Build · Share · Connect',sort_new:'NEW',sort_top:'TOP',login:'LOGIN / SIGN UP'}},
+  ko:{code:'KO',flag:'🇰🇷',name:'한국어',t:{nav_feed:'피드',nav_ranking:'랭킹',nav_profile:'프로필',tagline:'Build · Share · Connect',sort_new:'최신',sort_top:'인기',login:'로그인 / 가입'}},
+  zh:{code:'ZH',flag:'🇨🇳',name:'中文',t:{nav_feed:'动态',nav_ranking:'排行榜',nav_profile:'我的',tagline:'构建·分享·连接',sort_new:'最新',sort_top:'热门',login:'登录 / 注册'}},
+  de:{code:'DE',flag:'🇩🇪',name:'Deutsch',t:{nav_feed:'Feed',nav_ranking:'Ranking',nav_profile:'Profil',tagline:'Bauen · Teilen · Verbinden',sort_new:'NEU',sort_top:'TOP',login:'LOGIN / REGISTRIEREN'}},
+};
+let currentLang = 'ja';
+function T(key){ return LANGS[currentLang]?.t[key] || LANGS.en.t[key] || key }
+
+function buildLangDropdown(){
+  const dd = document.getElementById('langDropdown');
+  dd.innerHTML = Object.entries(LANGS).map(([k,l])=>
+    `<div class="lang-option${k===currentLang?' active':''}" onclick="setLang('${k}')">
+      <span>${l.flag}</span><span>${l.name}</span>
+      <span class="lang-native">${l.code}</span>
+    </div>`
+  ).join('');
+}
+window.toggleLang = function(){
+  document.getElementById('langSwitcher').classList.toggle('open');
+}
+window.setLang = function(lang){
+  currentLang = lang;
+  document.getElementById('langFlag').textContent = LANGS[lang].flag;
+  document.getElementById('langCode').textContent  = LANGS[lang].code;
+  document.getElementById('langSwitcher').classList.remove('open');
+  buildLangDropdown();
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(T(key)) el.textContent = T(key);
+  });
+}
+
+// ── AUTH STATE ─────────────────────────────────────────
+if(auth){
+  onAuthStateChanged(auth, async user => {
+    currentUser = user;
+    if(user){
+      await ensureUserDoc(user);
+      userData = await loadUserData(user.uid);
+      onLogin();
+    } else {
+      onLogout();
+    }
+  });
+}
+
+async function ensureUserDoc(user){
+  if(!db) return;
+  const ref = doc(db,'users',user.uid);
+  const snap = await getDoc(ref);
+  if(!snap.exists()){
+    const today = todayStr();
+    await setDoc(ref,{
+      uid: user.uid,
+      displayName: user.displayName || 'Builder',
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      country: 'JP',
+      bio: '',
+      totalGP: 0,
+      totalPosts: 0,
+      collectedFlags: {},
+      gpToday: GP_PER_DAY,
+      gpDate: today,
+      createdAt: serverTimestamp(),
+    });
+  }
+}
+
+async function loadUserData(uid){
+  if(!db) return null;
+  const snap = await getDoc(doc(db,'users',uid));
+  return snap.exists() ? {id:snap.id,...snap.data()} : null;
+}
+
+function todayStr(){ return new Date().toISOString().slice(0,10) }
+
+function getGPRemaining(){
+  if(!userData) return 0;
+  if(userData.gpDate !== todayStr()) return GP_PER_DAY;
+  return userData.gpToday ?? GP_PER_DAY;
+}
+
+function onLogin(){
+  // Nav
+  document.getElementById('navAuthArea').innerHTML =
+    `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showPage('profile')">
+      <div class="nav-avatar">${userData?.photoURL ? `<img src="${userData.photoURL}">` : '👤'}</div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink2)">${userData?.displayName||'Builder'}</span>
+    </div>
+    <button class="btn-outline" style="width:auto;padding:5px 10px;margin-top:0;font-size:8px" onclick="doSignOut()">LOGOUT</button>`;
+  document.getElementById('btnPost').style.display = '';
+  document.getElementById('navGP').style.display = '';
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('gpWidget').style.display = '';
+  updateGPDisplay();
+  renderProfile();
+  closeModal('authModal');
+  toast('Welcome back, ' + (userData?.displayName||'Builder') + ' ⚡');
+}
+
+function onLogout(){
+  userData = null;
+  document.getElementById('navAuthArea').innerHTML =
+    `<button class="btn-auth" onclick="openModal('authModal')">${T('login')||'LOGIN / SIGN UP'}</button>`;
+  document.getElementById('btnPost').style.display = 'none';
+  document.getElementById('navGP').style.display = 'none';
+  document.getElementById('heroSection').style.display = '';
+  document.getElementById('gpWidget').style.display = 'none';
+  document.getElementById('profileNotLoggedIn').style.display = '';
+  document.getElementById('profileLoggedIn').style.display = 'none';
+}
+
+function updateGPDisplay(){
+  const gp = getGPRemaining();
+  document.getElementById('gpNum').textContent = gp;
+  document.getElementById('navGPNum').textContent = gp;
+  const pct = (gp/GP_PER_DAY*100)+'%';
+  document.getElementById('gpBar').style.width = pct;
+  document.getElementById('gpSub').textContent = `${gp} / ${GP_PER_DAY} GP TODAY`;
+}
+
+// ── AUTH ACTIONS ───────────────────────────────────────
+window.emailLogin = async function(){
+  if(!auth){ toast('Demo mode — Firebase not connected'); return; }
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!email||!pass){ errEl.textContent = 'Please fill in all fields'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e){
+    errEl.textContent = e.code === 'auth/invalid-credential' ? 'Invalid email or password' : e.message;
+  }
+}
+
+window.emailSignup = async function(){
+  if(!auth){ toast('Demo mode — Firebase not connected'); return; }
+  const name  = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass  = document.getElementById('signupPassword').value;
+  const errEl = document.getElementById('signupError');
+  errEl.textContent = '';
+  if(!name||!email||!pass){ errEl.textContent = 'Please fill in all fields'; return; }
+  if(pass.length < 8){ errEl.textContent = 'Password must be 8+ characters'; return; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await ensureUserDoc(cred.user);
+    userData = await loadUserData(cred.user.uid);
+  } catch(e){
+    errEl.textContent = e.code === 'auth/email-already-in-use' ? 'Email already in use' : e.message;
+  }
+}
+
+window.authWithGoogle = async function(){
+  if(!auth){ toast('Demo mode — Firebase not connected'); return; }
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch(e){ toast(e.message); }
+}
+
+window.authWithTwitter = async function(){
+  if(!auth){ toast('Demo mode — Enable Twitter auth in Firebase Console'); return; }
+  try {
+    await signInWithPopup(auth, new TwitterAuthProvider());
+  } catch(e){ toast(e.code === 'auth/operation-not-allowed' ? 'Twitter auth not enabled in Firebase Console' : e.message); }
+}
+
+window.doSignOut = async function(){
+  if(auth) await signOut(auth);
+  toast('Logged out');
+}
+
+// ── POST SUBMIT ────────────────────────────────────────
+let selectedImgFile = null;
+const postTags = [];
+
+window.handleImgSelect = function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ toast('Image must be under 5MB'); return; }
+  selectedImgFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('previewImg').src = url;
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('uploadPreview').style.display = '';
+}
+window.handleImgDrop = function(e){
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if(f && f.type.startsWith('image/')){
+    document.getElementById('imgFileInput').files = e.dataTransfer.files;
+    handleImgSelect({target:{files:e.dataTransfer.files}});
+  }
+  document.getElementById('uploadZone').classList.remove('drag');
+}
+window.removeImg = function(){
+  selectedImgFile = null;
+  document.getElementById('imgFileInput').value = '';
+  document.getElementById('uploadZone').style.display = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+}
+
+window.handleTagInput = function(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const val = document.getElementById('tagInput').value.trim().replace(/[,]/g,'');
+    if(!val||postTags.includes(val)||postTags.length>=8) return;
+    postTags.push(val);
+    renderTagChips();
+    document.getElementById('tagInput').value = '';
+  }
+}
+function renderTagChips(){
+  const wrap = document.getElementById('tagsWrap');
+  wrap.querySelectorAll('.tag-chip').forEach(el=>el.remove());
+  const input = document.getElementById('tagInput');
+  postTags.forEach((tag,i) => {
+    const chip = document.createElement('div');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `<span>${tag}</span><span class="tag-chip-remove" onclick="removeTag(${i})">✕</span>`;
+    wrap.insertBefore(chip, input);
+  });
+}
+window.removeTag = function(i){
+  postTags.splice(i,1); renderTagChips();
+}
+
+window.submitPost = async function(){
+  if(!currentUser){ toast('Please login first'); return; }
+  const title    = document.getElementById('postTitle').value.trim();
+  const category = document.getElementById('postCategory').value;
+  const scale    = document.getElementById('postScale').value;
+  const desc     = document.getElementById('postDesc').value.trim();
+  const point    = document.getElementById('postPoint').value.trim();
+  const errEl    = document.getElementById('postError');
+  errEl.textContent = '';
+
+  if(!title){ errEl.textContent = 'Title is required'; return; }
+  if(!category){ errEl.textContent = 'Please select a category'; return; }
+  if(!selectedImgFile){ errEl.textContent = 'Please add a photo'; return; }
+
+  const btn = document.getElementById('btnSubmitPost');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> UPLOADING...';
+
+  try {
+    let imageURL = '';
+    if(storage && selectedImgFile){
+      const imgRef = ref(storage, `posts/${currentUser.uid}/${Date.now()}_${selectedImgFile.name}`);
+      const snap = await new Promise((res,rej) => {
+        const task = uploadBytesResumable(imgRef, selectedImgFile);
+        task.on('state_changed', null, rej, () => res(task.snapshot));
+      });
+      imageURL = await getDownloadURL(snap.ref);
+    }
+
+    const postData = {
+      uid: currentUser.uid,
+      displayName: userData?.displayName || 'Builder',
+      photoURL: userData?.photoURL || '',
+      country: userData?.country || 'JP',
+      title,
+      category,
+      scale: scale||'',
+      desc,
+      point,
+      tags: [...postTags],
+      imageURL,
+      gp: 0,
+      flagsFrom: {},
+      createdAt: serverTimestamp(),
+    };
+
+    if(db){
+      await addDoc(collection(db,'posts'), postData);
+      // Update user post count
+      await updateDoc(doc(db,'users',currentUser.uid),{
+        totalPosts: increment(1)
+      });
+    }
+
+    // Reset form
+    removeImg();
+    document.getElementById('postTitle').value    = '';
+    document.getElementById('postCategory').value = '';
+    document.getElementById('postScale').value    = '';
+    document.getElementById('postDesc').value     = '';
+    document.getElementById('postPoint').value    = '';
+    postTags.length = 0; renderTagChips();
+    closeModal('postModal');
+    toast('Build posted! ⚡');
+  } catch(e){
+    errEl.textContent = 'Upload failed: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'PUBLISH BUILD';
+  }
+}
+
+// ── FEED ───────────────────────────────────────────────
+let feedSort = 'new';
+let feedUnsubscribe = null;
+
+function loadFeed(){
+  if(!db){ renderDemoFeed(); return; }
+  if(feedUnsubscribe) feedUnsubscribe();
+  document.getElementById('feedContainer').innerHTML = '<div class="feed-loading">LOADING BUILDS...</div>';
+  const order = feedSort === 'new' ? 'createdAt' : 'gp';
+  const q = query(collection(db,'posts'), orderBy(order,'desc'), limit(30));
+  feedUnsubscribe = onSnapshot(q, snap => {
+    const posts = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderFeed(posts);
+    updateStats(posts);
+    renderSidebarCountries(posts);
+    renderSidebarBuilders(posts);
+  });
+}
+
+window.setSort = function(sort, btn){
+  feedSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadFeed();
+}
+
+function timeAgo(ts){
+  if(!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const sec = Math.floor((Date.now()-d)/1000);
+  if(sec<60) return `${sec}s ago`;
+  if(sec<3600) return `${Math.floor(sec/60)}m ago`;
+  if(sec<86400) return `${Math.floor(sec/3600)}h ago`;
+  return `${Math.floor(sec/86400)}d ago`;
+}
+
+function renderFeed(posts){
+  const el = document.getElementById('feedContainer');
+  if(!posts.length){
+    el.innerHTML = `<div class="feed-empty"><div class="feed-empty-icon">🔧</div>NO BUILDS YET — BE THE FIRST!</div>`;
+    return;
+  }
+  el.innerHTML = posts.map((p,i) => renderPostCard(p, i)).join('');
+}
+
+function renderPostCard(p, delay=0){
+  const flags = Object.entries(p.flagsFrom||{})
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,12)
+    .map(([code,cnt])=>`<div class="fr-flag">${getCountryFlag(code)}<span class="fr-count">${cnt}</span></div>`)
+    .join('');
+
+  const tags = [
+    p.scale ? `<span class="post-tag scale">${p.scale}</span>` : '',
+    p.category ? `<span class="post-tag cat">${p.category}</span>` : '',
+    ...(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`)
+  ].filter(Boolean).join('');
+
+  return `
+  <div class="post" style="animation-delay:${delay*0.05}s" onclick="openPostDetail('${p.id}')">
+    <div class="post-img-wrap">
+      ${p.imageURL
+        ? `<img src="${p.imageURL}" alt="${p.title}" loading="lazy">`
+        : `<div class="post-no-img">PX</div>`}
+    </div>
+    <div class="post-header" onclick="event.stopPropagation()">
+      <div class="post-user">
+        <div class="post-avatar">${p.photoURL?`<img src="${p.photoURL}">`:'👤'}</div>
+        <div>
+          <div class="post-username">${p.displayName||'Builder'} ${getCountryFlag(p.country||'')}</div>
+          <div class="post-time">${timeAgo(p.createdAt)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-work-title">${p.title}</div>
+      ${tags ? `<div class="post-meta">${tags}</div>` : ''}
+      ${p.desc ? `<div class="post-desc">${p.desc}</div>` : ''}
+      ${p.point ? `<div class="post-point">✦ ${p.point}</div>` : ''}
+    </div>
+    ${flags ? `<div class="post-fr"><div class="post-fr-label">🌍 LIKES FROM</div><div class="fr-flags">${flags}</div></div>` : ''}
+    <div class="post-actions" onclick="event.stopPropagation()">
+      <button class="action-btn" onclick="sendGP('${p.id}')">
+        <span class="icon">⚡</span>
+        <span>GP</span>
+        <span class="action-count">${p.gp||0}</span>
+      </button>
+      <button class="action-btn" onclick="sendFlag('${p.id}')">
+        <span class="icon">${getCountryFlag(userData?.country||'JP')}</span>
+        <span>FLAG</span>
+      </button>
+      <button class="action-btn" onclick="openPostDetail('${p.id}');event.stopPropagation()">
+        <span class="icon">🔍</span><span>DETAIL</span>
+      </button>
+      ${currentUser?.uid === p.uid ? `<button class="btn-danger" onclick="deletePost('${p.id}');event.stopPropagation()">🗑</button>` : ''}
+    </div>
+  </div>`;
+}
+
+// ── GP & FLAG ACTIONS ─────────────────────────────────
+window.sendGP = async function(postId){
+  if(!currentUser){ toast('Login to send GP'); return; }
+  const gp = getGPRemaining();
+  if(gp <= 0){ toast('No GP remaining today — come back tomorrow!'); return; }
+  if(!db){ toast('Demo mode — Firebase not connected'); return; }
+
+  try {
+    await runTransaction(db, async tx => {
+      const postRef = doc(db,'posts',postId);
+      const userRef = doc(db,'users',currentUser.uid);
+      const postSnap = await tx.get(postRef);
+      const userSnap = await tx.get(userRef);
+      if(!postSnap.exists()||!userSnap.exists()) throw 'not found';
+      const ud = userSnap.data();
+      let remaining = ud.gpDate === todayStr() ? (ud.gpToday??GP_PER_DAY) : GP_PER_DAY;
+      if(remaining <= 0) throw 'no gp';
+      tx.update(postRef, { gp: increment(1) });
+      tx.update(userRef, { gpToday: remaining-1, gpDate: todayStr() });
+      // Update post owner's totalGP
+      const ownerId = postSnap.data().uid;
+      if(ownerId !== currentUser.uid){
+        tx.update(doc(db,'users',ownerId), { totalGP: increment(1) });
+      }
+    });
+    userData = await loadUserData(currentUser.uid);
+    updateGPDisplay();
+    toast('⚡ GP sent!');
+  } catch(e){
+    if(e==='no gp') toast('No GP remaining today');
+    else toast('Error: ' + e);
+  }
+}
+
+window.sendFlag = async function(postId){
+  if(!currentUser){ toast('Login to send flag'); return; }
+  const countryCode = userData?.country || 'JP';
+  if(!db){ toast('Demo mode — Firebase not connected'); return; }
+
+  try {
+    await updateDoc(doc(db,'posts',postId), {
+      [`flagsFrom.${countryCode}`]: increment(1)
+    });
+    // Save to recipient's collected flags
+    const postSnap = await getDoc(doc(db,'posts',postId));
+    if(postSnap.exists()){
+      const ownerId = postSnap.data().uid;
+      await updateDoc(doc(db,'users',ownerId),{
+        [`collectedFlags.${countryCode}`]: increment(1)
+      });
+    }
+    toast(`${getCountryFlag(countryCode)} Flag sent!`);
+  } catch(e){ toast('Error: '+e.message); }
+}
+
+// ── DELETE POST ────────────────────────────────────────
+window.deletePost = async function(postId){
+  if(!currentUser||!db) return;
+  if(!confirm('Delete this post?')) return;
+  await deleteDoc(doc(db,'posts',postId));
+  await updateDoc(doc(db,'users',currentUser.uid),{ totalPosts: increment(-1) });
+  toast('Post deleted');
+}
+
+// ── POST DETAIL ────────────────────────────────────────
+window.openPostDetail = async function(postId){
+  if(!db) return;
+  openModal('postDetailModal');
+  document.getElementById('detailBody').innerHTML = '<div class="feed-loading">LOADING...</div>';
+  const snap = await getDoc(doc(db,'posts',postId));
+  if(!snap.exists()){ document.getElementById('detailBody').innerHTML = 'Not found'; return; }
+  const p = {id:snap.id,...snap.data()};
+  document.getElementById('detailTitle').textContent = p.title;
+
+  const flagEntries = Object.entries(p.flagsFrom||{}).sort((a,b)=>b[1]-a[1]);
+  const flagBars = flagEntries.map(([code,cnt])=>{
+    const max = flagEntries[0]?.[1]||1;
+    const pct = Math.round(cnt/max*100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:18px;width:24px">${getCountryFlag(code)}</span>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink2);width:80px">${getCountryName(code)}</span>
+      <div style="flex:1;height:6px;background:var(--bg3);border:1px solid var(--border)">
+        <div style="width:${pct}%;height:100%;background:var(--accent);box-shadow:0 0 6px rgba(0,229,255,0.5)"></div>
+      </div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--accent);width:24px;text-align:right">${cnt}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detailBody').innerHTML = `
+    ${p.imageURL ? `<img src="${p.imageURL}" style="width:100%;max-height:300px;object-fit:cover;margin-bottom:16px">` : ''}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div class="post-avatar">${p.photoURL?`<img src="${p.photoURL}">`:'👤'}</div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">${p.displayName} ${getCountryFlag(p.country)}</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">${timeAgo(p.createdAt)}</div>
+      </div>
+      <div style="margin-left:auto;font-family:var(--font-head);font-size:22px;color:var(--gold)">⚡${p.gp||0}</div>
+    </div>
+    ${p.desc ? `<p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:12px">${p.desc}</p>` : ''}
+    ${p.point ? `<div class="post-point" style="margin-bottom:16px">✦ ${p.point}</div>` : ''}
+    ${flagBars ? `<div style="margin-top:20px"><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:12px">🌍 LIKES FROM THE WORLD</div>${flagBars}</div>` : ''}
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="action-btn" style="flex:1;justify-content:center" onclick="sendGP('${p.id}')">⚡ SEND GP</button>
+      <button class="btn-send-flag" onclick="sendFlag('${p.id}')">🏴 ${getCountryFlag(userData?.country||'JP')} SEND FLAG</button>
+    </div>`;
+}
+
+// ── STATS / SIDEBAR ────────────────────────────────────
+function updateStats(posts){
+  document.getElementById('statPosts').textContent = posts.length;
+  const uids = [...new Set(posts.map(p=>p.uid))];
+  document.getElementById('statUsers').textContent = uids.length;
+  const countries = [...new Set(posts.flatMap(p=>Object.keys(p.flagsFrom||{})))];
+  document.getElementById('statCountries').textContent = countries.length;
+}
+
+function renderSidebarCountries(posts){
+  const countryCount = {};
+  posts.forEach(p => Object.keys(p.flagsFrom||{}).forEach(c=>{
+    countryCount[c] = (countryCount[c]||0) + (p.flagsFrom[c]||0);
+  }));
+  const sorted = Object.entries(countryCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  document.getElementById('activeCountries').innerHTML = sorted.map(([code,cnt])=>
+    `<div class="active-country">
+      <span class="ac-flag">${getCountryFlag(code)}</span>
+      <span class="ac-name">${getCountryName(code)}</span>
+      <span class="ac-count">${cnt}</span>
+    </div>`
+  ).join('') || '<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">No data yet</div>';
+}
+
+function renderSidebarBuilders(posts){
+  const builderGP = {};
+  const builderNames = {};
+  posts.forEach(p => {
+    builderGP[p.uid] = (builderGP[p.uid]||0) + (p.gp||0);
+    builderNames[p.uid] = p.displayName;
+  });
+  const sorted = Object.entries(builderGP).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('topBuilders').innerHTML = sorted.map(([uid,gp])=>
+    `<div class="active-country">
+      <span class="ac-flag">👤</span>
+      <span class="ac-name">${builderNames[uid]||'Builder'}</span>
+      <span class="ac-count">⚡${gp}</span>
+    </div>`
+  ).join('') || '<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">No data yet</div>';
+}
+
+// ── RANKING ────────────────────────────────────────────
+let rankTab = 'works';
+async function loadRanking(){
+  if(!db){ renderDemoRanking(); return; }
+  document.getElementById('rankingContainer').innerHTML = '<div class="feed-loading">LOADING...</div>';
+  const q = query(collection(db,'posts'), orderBy('gp','desc'), limit(50));
+  const snap = await getDocs(q);
+  const posts = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderRanking(posts);
+}
+
+window.setRankTab = function(tab, btn){
+  rankTab = tab;
+  document.querySelectorAll('.rank-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadRanking();
+}
+
+function renderRanking(posts){
+  let items = [];
+  if(rankTab === 'works'){
+    items = posts.map((p,i) => ({
+      num:i+1, name:p.title, sub:p.displayName+' '+getCountryFlag(p.country||''),
+      score:p.gp||0, label:'GP', img:p.imageURL, id:p.id
+    }));
+  } else if(rankTab === 'countries'){
+    const cc = {};
+    posts.forEach(p => Object.entries(p.flagsFrom||{}).forEach(([code,cnt])=>{
+      cc[code] = (cc[code]||0) + cnt;
+    }));
+    items = Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([code,cnt],i)=>({
+      num:i+1, name:getCountryName(code), sub:getCountryFlag(code), score:cnt, label:'FLAGS'
+    }));
+  } else {
+    // Most flags received
+    const fc = {};
+    const ft = {};
+    posts.forEach(p => {
+      const n = Object.keys(p.flagsFrom||{}).length;
+      fc[p.id] = n;
+      ft[p.id] = {title:p.title, user:p.displayName, img:p.imageURL};
+    });
+    items = Object.entries(fc).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([id,n],i)=>({
+      num:i+1, name:ft[id].title, sub:ft[id].user, score:n, label:'COUNTRIES', img:ft[id].img, id
+    }));
+  }
+
+  document.getElementById('rankingContainer').innerHTML = items.map(item=>`
+    <div class="rank-item${item.num===1?' gold':''}" onclick="${item.id?`openPostDetail('${item.id}')`:''}">
+      <div class="rank-num">${item.num}</div>
+      <div class="rank-thumb">
+        ${item.img ? `<img src="${item.img}" loading="lazy">` : '<span>🔧</span>'}
+      </div>
+      <div class="rank-info">
+        <div class="rank-name">${item.name}</div>
+        <div class="rank-user">${item.sub}</div>
+      </div>
+      <div class="rank-right">
+        <div class="rank-gp">${item.score}</div>
+        <div class="rank-gp-label">${item.label}</div>
+      </div>
+    </div>`).join('') || '<div class="feed-empty">No data yet</div>';
+}
+
+// ── PROFILE ────────────────────────────────────────────
+async function renderProfile(){
+  if(!currentUser||!db) return;
+  userData = await loadUserData(currentUser.uid);
+  if(!userData) return;
+
+  document.getElementById('profileNotLoggedIn').style.display = 'none';
+  document.getElementById('profileLoggedIn').style.display   = '';
+  document.getElementById('profileAvatar').innerHTML = userData.photoURL
+    ? `<img src="${userData.photoURL}">` : '👤';
+  document.getElementById('profileName').textContent   = userData.displayName||'Builder';
+  document.getElementById('profileHandle').textContent = '@' + (userData.displayName||'builder').toLowerCase().replace(/\s+/g,'_');
+  document.getElementById('profileBio').textContent    = userData.bio||'';
+
+  // My posts
+  const q = query(collection(db,'posts'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  const myPosts = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const totalGP = myPosts.reduce((s,p)=>s+(p.gp||0),0);
+  const allFlags = myPosts.flatMap(p=>Object.keys(p.flagsFrom||{}));
+  const uniqueFlags = [...new Set(allFlags)];
+
+  document.getElementById('pstatWorks').textContent    = myPosts.length;
+  document.getElementById('pstatGP').textContent       = totalGP;
+  document.getElementById('pstatCountries').textContent = uniqueFlags.length;
+
+  // Builds tab
+  document.getElementById('ptab-builds').innerHTML =
+    `<div class="works-grid">${myPosts.map(p=>`
+      <div class="work-thumb" onclick="openPostDetail('${p.id}')">
+        ${p.imageURL ? `<img src="${p.imageURL}" loading="lazy">` : '<div class="work-thumb-empty">🔧</div>'}
+        <div class="work-thumb-overlay">⚡${p.gp||0}</div>
+      </div>`).join('')}
+    </div>` || '<div class="feed-empty">No builds yet</div>';
+
+  // Flags tab
+  const collectedFlags = userData.collectedFlags || {};
+  document.getElementById('ptab-flags').innerHTML =
+    `<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">
+      ${uniqueFlags.length} / ${COUNTRIES.length} COUNTRIES
+    </div>
+    <div class="flags-grid">
+      ${COUNTRIES.map(c=>{
+        const cnt = collectedFlags[c.code]||0;
+        return `<div class="flag-cell${cnt>0?' collected':' locked'}" title="${c.name}${cnt?' · '+cnt+' flags':''}">
+          <div class="fc-flag">${c.flag}</div>
+          ${cnt ? `<div class="fc-count">${cnt}</div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Achievements tab
+  const BADGES = [
+    {key:'first',req:1, name:'FIRST CONTACT',desc:'First flag received'},
+    {key:'b5',  req:5, name:'5 COUNTRIES',   desc:'Flags from 5 countries'},
+    {key:'b10', req:10,name:'WORLD BUILDER', desc:'Flags from 10 countries'},
+    {key:'b20', req:20,name:'GLOBAL REACH',  desc:'Flags from 20 countries'},
+    {key:'b50', req:50,name:'PLANET BUILDER',desc:'Flags from 50 countries'},
+  ];
+  document.getElementById('ptab-achievements').innerHTML =
+    `<div class="ach-grid">${BADGES.map(b=>{
+      const unlocked = uniqueFlags.length >= b.req;
+      const mosaicFlags = COUNTRIES.slice(0,20).map(c=>`<div class="ach-mosaic-flag">${c.flag}</div>`).join('');
+      return `<div class="ach-card${unlocked?' unlocked':' locked'}">
+        <div class="ach-mosaic">${mosaicFlags}<div class="ach-mosaic-overlay"></div>
+          <div class="ach-num">${b.req}</div>
+        </div>
+        <div class="ach-info">
+          <div class="ach-name">${b.name}</div>
+          <div class="ach-desc">${b.desc}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+window.setPTab = function(tab, el){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['builds','flags','achievements'].forEach(t=>{
+    document.getElementById(`ptab-${t}`).style.display = t===tab?'':'none';
+  });
+}
+
+// ── EDIT PROFILE ──────────────────────────────────────
+function buildCountrySelect(){
+  const sel = document.getElementById('editCountry');
+  sel.innerHTML = COUNTRIES.map(c=>`<option value="${c.code}">${c.flag} ${c.name}</option>`).join('');
+}
+
+window.saveProfile = async function(){
+  if(!currentUser||!db) return;
+  const name    = document.getElementById('editName').value.trim();
+  const bio     = document.getElementById('editBio').value.trim();
+  const country = document.getElementById('editCountry').value;
+  const errEl   = document.getElementById('editProfileError');
+  if(!name){ errEl.textContent = 'Name is required'; return; }
+  try {
+    await updateDoc(doc(db,'users',currentUser.uid),{ displayName:name, bio, country });
+    await updateProfile(currentUser,{ displayName:name });
+    userData = await loadUserData(currentUser.uid);
+    closeModal('editProfileModal');
+    renderProfile();
+    toast('Profile updated ✓');
+  } catch(e){ errEl.textContent = e.message; }
+}
+
+// Open edit profile — prefill
+const _origOpenModal = window.openModal;
+window.openModal = function(id){
+  if(id==='editProfileModal' && userData){
+    document.getElementById('editName').value    = userData.displayName||'';
+    document.getElementById('editBio').value     = userData.bio||'';
+    buildCountrySelect();
+    document.getElementById('editCountry').value = userData.country||'JP';
+  }
+  document.getElementById(id).classList.add('open');
+}
+
+// ── DEMO MODE ─────────────────────────────────────────
+function renderDemoFeed(){
+  const demoPosts = [
+    {id:'d1',displayName:'tanaka_builds',country:'JP',title:'RX-78 DEEP CHROME CUSTOM',category:'gunpla',scale:'MG',desc:'全塗装。クロームシルバーにブルーパープルを重ねたオリジナルカラー。',point:'アイセンサー部の自作エッチング加工',gp:847,imageURL:'',flagsFrom:{US:12,KR:8,DE:5,FR:4,CN:7},createdAt:null,tags:['custom','chrome']},
+    {id:'d2',displayName:'lionartworks',country:'US',title:'JUNGLE DIORAMA',category:'diorama',scale:'1/35',desc:'Vietnam War era diorama with 40+ hand-painted figures.',point:'Each leaf was individually sculpted and painted',gp:312,imageURL:'',flagsFrom:{JP:15,KR:3,GB:6},createdAt:null,tags:['diorama','ww2']},
+    {id:'d3',displayName:'kimsculpt',country:'KR',title:'COSMIC STRIKER',category:'sci-fi',scale:'HG',desc:'오리지널 컬러 도장 + 자작 LED 내장',point:'내부 LED의 은하 패턴 조명',gp:589,imageURL:'',flagsFrom:{JP:20,US:11,CN:5},createdAt:null,tags:['LED','custom']},
+  ];
+  renderFeed(demoPosts);
+  updateStats(demoPosts);
+  renderSidebarCountries(demoPosts);
+  renderSidebarBuilders(demoPosts);
+}
+
+function renderDemoRanking(){
+  renderRanking([
+    {id:'d1',title:'RX-78 DEEP CHROME CUSTOM',displayName:'tanaka_builds',country:'JP',gp:847,flagsFrom:{US:12,KR:8}},
+    {id:'d3',title:'COSMIC STRIKER',displayName:'kimsculpt',country:'KR',gp:589,flagsFrom:{JP:20}},
+    {id:'d2',title:'JUNGLE DIORAMA',displayName:'lionartworks',country:'US',gp:312,flagsFrom:{JP:15}},
+  ]);
+}
+
+// ── PAGE ROUTING ──────────────────────────────────────
+window.showPage = function(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const nl = document.getElementById('nl-'+page);
+  if(nl) nl.classList.add('active');
+  if(page==='ranking') loadRanking();
+  if(page==='profile') renderProfile();
+}
+
+window.mnActive = function(id){
+  document.querySelectorAll('.mobile-nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────
+window.closeModal = function(id){
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if(e.target===overlay) overlay.classList.remove('open');
+  });
+});
+
+// ── AUTH TAB ──────────────────────────────────────────
+window.setAuthTab = function(tab){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('loginForm').style.display  = tab==='login'  ? '' : 'none';
+  document.getElementById('signupForm').style.display = tab==='signup' ? '' : 'none';
+}
+
+// ── HERO FLAGS ────────────────────────────────────────
+function initHeroFlags(){
+  const flags = ['🇯🇵','🇺🇸','🇰🇷','🇨🇳','🇩🇪','🇫🇷','🇧🇷','🇮🇩','🇮🇳','🇦🇺','🇬🇧','🇮🇹'];
+  document.getElementById('heroFlags').innerHTML = flags.map(f=>`<div class="hero-flag">${f}</div>`).join('');
+}
+
+// ── TOAST ─────────────────────────────────────────────
+window.toast = function(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── CLOSE LANG ON OUTSIDE CLICK ───────────────────────
+document.addEventListener('click', e=>{
+  if(!document.getElementById('langSwitcher').contains(e.target))
+    document.getElementById('langSwitcher').classList.remove('open');
+});
+
+// ── INIT ──────────────────────────────────────────────
+buildLangDropdown();
+initHeroFlags();
+loadFeed();
+
+</script>
+</body>
+</html>
+
+{
+  "name": "PLAMOX — Where Your Build Meets the World",
+  "short_name": "PLAMOX",
+  "description": "世界中のモデラーが作品を見せ合い、国旗でリスペクトを送るグローバル模型SNS",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#04060a",
+  "theme_color": "#04060a",
+  "orientation": "portrait-primary",
+  "lang": "ja",
+  "categories": ["social", "entertainment"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Feed",
+      "short_name": "Feed",
+      "description": "最新の作品フィードを開く",
+      "url": "./#feed",
+      "icons": []
+    },
+    {
+      "name": "Ranking",
+      "short_name": "Rank",
+      "description": "グローバルランキングを開く",
+      "url": "./#ranking",
+      "icons": []
+    }
+  ]
+}
+
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /posts/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
