@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#04060a"/>
+  <rect x="0" y="0" width="512" height="4" fill="#00e5ff" opacity="0.6"/>
+  <rect x="0" y="508" width="512" height="4" fill="#00e5ff" opacity="0.6"/>
+  <rect x="0" y="0" width="4" height="512" fill="#00e5ff" opacity="0.6"/>
+  <rect x="508" y="0" width="4" height="512" fill="#00e5ff" opacity="0.6"/>
+  <!-- Corner cuts -->
+  <polygon points="0,0 60,0 0,60" fill="#00e5ff" opacity="0.7"/>
+  <polygon points="512,0 452,0 512,60" fill="#00e5ff" opacity="0.7"/>
+  <polygon points="0,512 60,512 0,452" fill="#39ff90" opacity="0.6"/>
+  <polygon points="512,512 452,512 512,452" fill="#9b59ff" opacity="0.5"/>
+  <!-- PLAMOX text -->
+  <text x="256" y="230" font-family="Arial Black, sans-serif" font-weight="900" font-size="110" fill="#ccd8f0" text-anchor="middle" letter-spacing="6">PLAMO</text>
+  <text x="256" y="340" font-family="Arial Black, sans-serif" font-weight="900" font-size="140" fill="#00e5ff" text-anchor="middle" letter-spacing="8">X</text>
+  <!-- Tagline -->
+  <text x="256" y="400" font-family="Arial, sans-serif" font-size="24" fill="#445566" text-anchor="middle" letter-spacing="4">WHERE YOUR BUILD MEETS</text>
+  <text x="256" y="430" font-family="Arial, sans-serif" font-size="24" fill="#445566" text-anchor="middle" letter-spacing="4">THE WORLD</text>
+  <!-- Glow line -->
+  <line x1="100" y1="460" x2="412" y2="460" stroke="#00e5ff" stroke-width="2" opacity="0.4"/>
+</svg>
