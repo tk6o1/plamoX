@@ -8,6 +8,14 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == userId;
       allow update: if request.auth != null && request.auth.uid == userId;
       allow delete: if false;
+
+      // 国旗送信済み記録: 本人のみ読み書き可
+      match /flagsSent/{postId} {
+        allow read:   if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId;
+        allow update: if false;  // 上書き不可（重複送信防止）
+        allow delete: if false;
+      }
     }
 
     // Posts: ログイン済みが作成・更新可、本人のみ削除可

@@ -2311,20 +2311,56 @@ window.sendFlag = async function(postId){
   const countryCode = userData?.country || 'JP';
   if(!db){ toast('Demo mode — Firebase not connected'); return; }
 
+  // 1アカウント1投稿につき1回限りチェック
+  // users/{uid}/flagsSent/{postId} に送信済み記録を保存
+  const sentRef = doc(db, 'users', currentUser.uid, 'flagsSent', postId);
+
   try {
-    await updateDoc(doc(db,'posts',postId), {
-      [`flagsFrom.${countryCode}`]: increment(1)
-    });
-    // Save to recipient's collected flags
-    const postSnap = await getDoc(doc(db,'posts',postId));
-    if(postSnap.exists()){
+    await runTransaction(db, async tx => {
+      const sentSnap = await tx.get(sentRef);
+      if(sentSnap.exists()){
+        throw new Error('ALREADY_SENT');
+      }
+
+      const postRef  = doc(db, 'posts', postId);
+      const postSnap = await tx.get(postRef);
+      if(!postSnap.exists()) throw new Error('POST_NOT_FOUND');
+
       const ownerId = postSnap.data().uid;
-      await updateDoc(doc(db,'users',ownerId),{
+
+      // 投稿の flagsFrom を更新
+      tx.update(postRef, {
+        [`flagsFrom.${countryCode}`]: increment(1)
+      });
+
+      // 投稿者の collectedFlags を更新
+      tx.update(doc(db, 'users', ownerId), {
         [`collectedFlags.${countryCode}`]: increment(1)
       });
-    }
+
+      // 送信済み記録を保存（再送防止）
+      tx.set(sentRef, {
+        postId,
+        countryCode,
+        sentAt: serverTimestamp()
+      });
+    });
+
+    // ボタンをグレーアウト
+    document.querySelectorAll(`[data-post-id="${postId}"] .btn-flag-action`).forEach(btn=>{
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.title = 'Already sent';
+    });
+
     toast(`${getCountryFlag(countryCode)} ${T('flag_sent')}`);
-  } catch(e){ toast('Error: '+e.message); }
+  } catch(e){
+    if(e.message === 'ALREADY_SENT'){
+      toast('⚠ ' + (currentLang==='ja' ? 'この投稿にはすでに国旗を送りました' : 'You already sent a flag to this post'));
+    } else {
+      toast('Error: ' + e.message);
+    }
+  }
 }
 
 // ── DELETE POST ────────────────────────────────────────
