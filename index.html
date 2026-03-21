@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2304060a'/><text x='50%' y='55%' font-family='Arial Black' font-weight='900' font-size='14' fill='%2300e5ff' text-anchor='middle' dominant-baseline='middle'>PX</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700;900&family=Roboto+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════
    PLAMOX — Design System (Mecha / Game Dark UI)
@@ -27,8 +27,9 @@
   --accent:#00e5ff; --accent2:#0088bb;
   --green:#39ff90; --purple:#9b59ff; --warm:#ff4d1a; --gold:#ffc840;
   --font-head:'Orbitron',sans-serif;
-  --font-body:'Inter',sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
+  --font-body:'Roboto',sans-serif;
+  --font-mono:'Roboto Mono',monospace;
+  --font-cond:'Roboto Condensed',sans-serif;
   --clip-sm: polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
   --clip-md: polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
   --clip-lg: polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));
@@ -626,11 +627,337 @@ nav::after{
 
 /* ── MOBILE NAV ── */
 .mobile-nav{display:none}
+/* ══════════════════════════════════════════════════
+   PLAMOX PROFILE v3 — "一瞬でスゴさが伝わる" UI
+══════════════════════════════════════════════════ */
+
+/* ① HEADER */
+.prof-wrap{max-width:680px;margin:0 auto}
+.prof-header{
+  position:relative;background:var(--bg2);
+  border-bottom:1px solid var(--border2);
+  overflow:hidden;
+}
+.prof-cover{
+  height:120px;background:linear-gradient(135deg,#04060a 0%,#0a1428 50%,#04060a 100%);
+  position:relative;overflow:hidden;
+}
+.prof-cover::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 100% 100% at 20% 50%,rgba(0,229,255,0.15) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 80% at 80% 50%,rgba(57,255,144,0.08) 0%,transparent 60%);
+}
+.prof-cover-grid{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(0,229,255,0.04) 20px),
+             repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(0,229,255,0.03) 20px);
+}
+.prof-header-body{
+  padding:0 20px 20px;position:relative;
+}
+.prof-avatar-row{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-top:-44px;margin-bottom:12px;
+}
+.prof-avatar-outer{
+  width:88px;height:88px;border-radius:50%;
+  border:3px solid var(--bg2);background:var(--bg3);
+  box-shadow:0 0 0 2px var(--accent),0 0 20px rgba(0,229,255,0.3);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:40px;flex-shrink:0;
+}
+.prof-avatar-outer img{width:100%;height:100%;object-fit:cover}
+.prof-header-btns{
+  display:flex;gap:8px;padding-bottom:4px;
+}
+.btn-follow{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;font-weight:700;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:8px 20px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-follow:hover{background:#33eeff;box-shadow:0 0 14px rgba(0,229,255,0.5)}
+.btn-msg{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);cursor:pointer;
+  padding:8px 16px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-msg:hover{color:var(--accent);border-color:rgba(0,229,255,0.4)}
+.btn-edit-sm{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);cursor:pointer;
+  padding:8px 14px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-edit-sm:hover{color:var(--accent);border-color:rgba(0,229,255,0.4)}
+.prof-name-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:2px;flex-wrap:wrap;
+}
+.prof-name{
+  font-family:var(--font-cond);font-size:24px;font-weight:900;
+  color:var(--ink);letter-spacing:0.5px;
+}
+.prof-country-flag{font-size:22px;line-height:1}
+.prof-handle{
+  font-family:var(--font-mono);font-size:11px;color:var(--accent);
+  margin-bottom:6px;
+}
+.prof-tagline{
+  font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:10px;
+}
+.prof-style-chips{display:flex;flex-wrap:wrap;gap:5px}
+.prof-style-chip{
+  font-family:var(--font-mono);font-size:9px;color:var(--green);
+  background:rgba(57,255,144,0.08);border:1px solid rgba(57,255,144,0.2);
+  padding:3px 8px;border-radius:2px;
+}
+
+/* ② STATUS BAR — 戦闘力 */
+.prof-status{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:var(--bg2);
+}
+.prof-stat{
+  padding:16px 12px;text-align:center;border-right:1px solid var(--border);
+  cursor:default;transition:background 0.2s;
+}
+.prof-stat:last-child{border-right:none}
+.prof-stat:hover{background:rgba(0,229,255,0.03)}
+.prof-stat-num{
+  font-family:var(--font-cond);font-size:26px;font-weight:900;
+  color:var(--ink);line-height:1;margin-bottom:3px;
+}
+.prof-stat-num.accent{color:var(--accent)}
+.prof-stat-num.gold{color:var(--gold)}
+.prof-stat-label{
+  font-family:var(--font-mono);font-size:9px;color:var(--muted);
+  letter-spacing:1px;text-transform:uppercase;
+}
+.prof-rank-bar{
+  background:var(--bg3);border-bottom:1px solid var(--border);
+  padding:8px 20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;
+}
+.prof-rank-item{
+  font-family:var(--font-mono);font-size:10px;color:var(--ink2);
+  display:flex;align-items:center;gap:6px;
+}
+.prof-rank-num{
+  color:var(--gold);font-weight:700;font-size:12px;
+}
+
+/* ③ GLOBAL EVALUATION */
+.prof-block{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:20px;
+}
+.prof-block-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.prof-block-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-cond);font-size:14px;font-weight:900;
+  color:var(--ink);letter-spacing:1px;text-transform:uppercase;
+}
+.prof-block-title-icon{font-size:16px}
+.prof-block-more{
+  font-family:var(--font-mono);font-size:9px;color:var(--accent);
+  cursor:pointer;letter-spacing:1px;
+}
+.prof-block-more:hover{text-decoration:underline}
+.prof-global-hero{
+  display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  padding:14px 16px;background:var(--bg3);border:1px solid rgba(0,229,255,0.15);
+  clip-path:var(--clip-sm);
+}
+.prof-globe{font-size:32px}
+.prof-liked-count{
+  font-family:var(--font-cond);font-size:28px;font-weight:900;color:var(--accent);
+  line-height:1;
+}
+.prof-liked-label{
+  font-family:var(--font-mono);font-size:9px;color:var(--muted);
+  letter-spacing:1px;margin-top:2px;
+}
+.prof-flags-scroll{
+  display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:none;
+}
+.prof-flags-scroll::-webkit-scrollbar{display:none}
+.prof-flag-btn{
+  flex-shrink:0;font-size:24px;background:var(--bg3);
+  border:1px solid var(--border);padding:6px 10px;border-radius:4px;
+  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;
+}
+.prof-flag-btn:hover{border-color:var(--accent);background:rgba(0,229,255,0.08);transform:scale(1.1)}
+.prof-flag-cnt{
+  font-family:var(--font-mono);font-size:9px;color:var(--ink2);
+}
+.prof-flag-expand{
+  max-height:0;overflow:hidden;transition:max-height 0.3s ease;
+}
+.prof-flag-expand.open{max-height:400px}
+.prof-flag-bar-list{margin-top:12px}
+.prof-flag-bar-row{
+  display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid rgba(22,32,48,0.8);
+}
+.prof-flag-bar-flag{font-size:16px;width:24px;text-align:center}
+.prof-flag-bar-name{
+  font-family:var(--font-mono);font-size:10px;color:var(--ink2);
+  width:90px;flex-shrink:0;
+}
+.prof-flag-bar-track{
+  flex:1;height:5px;background:var(--bg4);border-radius:0;overflow:hidden;
+}
+.prof-flag-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--accent),var(--green));
+  box-shadow:0 0 4px rgba(0,229,255,0.5);transition:width 0.5s ease;
+}
+.prof-flag-bar-num{
+  font-family:var(--font-mono);font-size:10px;color:var(--accent);
+  width:24px;text-align:right;
+}
+
+/* ④ BADGES — 横スクロール */
+.prof-badges-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;
+  scrollbar-width:none;
+}
+.prof-badges-scroll::-webkit-scrollbar{display:none}
+.prof-badge-card{
+  flex-shrink:0;width:120px;
+  background:var(--bg3);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:14px 12px;text-align:center;
+  transition:all 0.2s;cursor:default;
+}
+.prof-badge-card.unlocked{
+  border-color:rgba(255,200,64,0.4);background:rgba(255,200,64,0.05);
+}
+.prof-badge-card.locked{opacity:0.3;filter:grayscale(1)}
+.prof-badge-card:hover{transform:translateY(-2px)}
+.prof-badge-icon{font-size:28px;margin-bottom:6px}
+.prof-badge-name{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:1px;
+  color:var(--muted);text-transform:uppercase;line-height:1.3;
+}
+.prof-badge-card.unlocked .prof-badge-name{color:var(--gold)}
+.prof-badge-req{
+  font-family:var(--font-cond);font-size:18px;font-weight:900;
+  color:var(--border2);margin-top:4px;
+}
+.prof-badge-card.unlocked .prof-badge-req{color:var(--gold)}
+
+/* ⑤ FEATURED BUILD */
+.featured-v3{
+  background:var(--bg3);border:1px solid rgba(255,200,64,0.25);
+  clip-path:var(--clip-md);overflow:hidden;cursor:pointer;
+  transition:all 0.2s;
+}
+.featured-v3:hover{border-color:rgba(255,200,64,0.5);box-shadow:0 0 20px rgba(255,200,64,0.08)}
+.featured-v3-img{
+  width:100%;height:200px;object-fit:cover;display:block;
+  background:var(--bg4);
+}
+.featured-v3-img-placeholder{
+  height:200px;background:var(--bg4);
+  display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.2;
+}
+.featured-v3-body{padding:16px}
+.featured-v3-label{
+  font-family:var(--font-mono);font-size:8px;color:var(--gold);
+  letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:6px;
+}
+.featured-v3-title{
+  font-family:var(--font-cond);font-size:20px;font-weight:900;
+  color:var(--ink);letter-spacing:0.5px;margin-bottom:10px;
+}
+.featured-v3-stats{display:flex;gap:16px;flex-wrap:wrap}
+.featured-v3-stat{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);font-size:11px;color:var(--ink2);
+}
+.featured-v3-stat strong{color:var(--accent);font-size:13px}
+
+/* ⑥ BUILDS GRID */
+.builds-grid-v3{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
+}
+.build-thumb-v3{
+  aspect-ratio:1;background:var(--bg3);overflow:hidden;
+  position:relative;cursor:pointer;
+}
+.build-thumb-v3 img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s}
+.build-thumb-v3:hover img{transform:scale(1.05)}
+.build-thumb-v3-empty{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:20px;opacity:0.15;
+}
+.build-thumb-v3-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(4,6,10,0.8) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.2s;
+  display:flex;align-items:flex-end;padding:6px;
+  font-family:var(--font-mono);font-size:9px;color:var(--accent);gap:6px;
+}
+.build-thumb-v3:hover .build-thumb-v3-overlay{opacity:1}
+
+/* ⑦ COMMUNITY & ⑧ RANKING */
+.prof-two-col{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border)}
+.prof-mini-block{
+  padding:16px 20px;border-right:1px solid var(--border);
+}
+.prof-mini-block:last-child{border-right:none}
+.prof-mini-title{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:2px;
+  color:var(--muted);margin-bottom:10px;text-transform:uppercase;
+}
+.prof-mini-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 0;border-bottom:1px solid rgba(22,32,48,0.6);
+}
+.prof-mini-row:last-child{border-bottom:none}
+.prof-mini-label{font-size:11px;color:var(--ink2)}
+.prof-mini-val{
+  font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--accent);
+}
+.prof-mini-val.gold{color:var(--gold)}
+
+/* SHARE BTN */
+.btn-share{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--accent);background:rgba(0,229,255,0.08);
+  border:1px solid rgba(0,229,255,0.25);cursor:pointer;
+  padding:6px 12px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-share:hover{background:rgba(0,229,255,0.15)}
+
+/* Responsive */
 @media(max-width:600px){
-  .mobile-nav{
-    display:flex!important;position:fixed;bottom:0;left:0;right:0;z-index:100;
-    background:rgba(4,6,10,0.97);border-top:1px solid var(--border2);height:56px;
-  }
+  .prof-cover{height:90px}
+  .prof-avatar-outer{width:72px;height:72px;font-size:32px}
+  .prof-name{font-size:20px}
+  .prof-stat-num{font-size:22px}
+  .prof-two-col{grid-template-columns:1fr}
+  .prof-mini-block{border-right:none;border-bottom:1px solid var(--border)}
+  .builds-grid-v3{grid-template-columns:repeat(3,1fr);gap:2px}
+  .prof-block{padding:16px 14px}
+  .prof-header-body{padding:0 14px 16px}
+}
+
+
+@media(max-width:600px){
+  .prof-hero{padding:24px 14px}
+  .prof-hero-inner{flex-direction:column;align-items:center;text-align:center}
+  .prof-hero-actions{flex-direction:row;justify-content:center}
+  .prof-power-grid{grid-template-columns:repeat(2,1fr)}
+  .prof-community-grid{grid-template-columns:repeat(3,1fr)}
+  .featured-card{flex-direction:column}
+  .featured-img{width:100%;height:160px}
+  .featured-info{padding:16px}
+  .prof-section{padding:20px 14px}
+  .prof-name{font-size:22px}
+}
+
   .mobile-nav-item{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:3px;cursor:pointer;background:transparent;border:none;
@@ -839,41 +1166,149 @@ nav::after{
 
 <!-- PROFILE -->
 <div class="page" id="page-profile">
+  <!-- Not logged in -->
   <div id="profileNotLoggedIn" style="text-align:center;padding:100px 20px">
     <div style="font-size:48px;margin-bottom:16px;opacity:0.3">👤</div>
-    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:20px">LOGIN TO VIEW YOUR PROFILE</div>
+    <div style="font-family:var(--font-mono);font-size:13px;color:var(--muted);letter-spacing:2px;margin-bottom:20px">LOGIN TO VIEW YOUR PROFILE</div>
     <button class="btn-auth" onclick="openModal('authModal')">LOGIN / SIGN UP</button>
   </div>
+
+  <!-- Logged in -->
   <div id="profileLoggedIn" style="display:none">
-    <div class="profile-hero">
-      <div class="profile-top">
-        <div class="profile-avatar-lg" id="profileAvatar">👤</div>
-        <div class="profile-info">
-          <div class="profile-name" id="profileName">—</div>
-          <div class="profile-handle" id="profileHandle">@—</div>
-          <div class="profile-bio" id="profileBio"></div>
-          <div class="profile-stat-row">
-            <div><div class="pstat-num" id="pstatWorks">0</div><div class="pstat-label">WORKS</div></div>
-            <div><div class="pstat-num" id="pstatGP">0</div><div class="pstat-label">TOTAL GP</div></div>
-            <div><div class="pstat-num" id="pstatCountries">0</div><div class="pstat-label">COUNTRIES</div></div>
+    <div class="prof-wrap" style="padding-bottom:80px">
+
+      <!-- ① HEADER -->
+      <div class="prof-header">
+        <div class="prof-cover">
+          <div class="prof-cover-grid"></div>
+        </div>
+        <div class="prof-header-body">
+          <div class="prof-avatar-row">
+            <div class="prof-avatar-outer" id="profileAvatar">👤</div>
+            <div class="prof-header-btns">
+              <button class="btn-share" onclick="openShareModal()">📤 SHARE</button>
+              <button class="btn-edit-sm" onclick="openModal('editProfileModal')">✏ EDIT</button>
+            </div>
+          </div>
+          <div class="prof-name-row">
+            <div class="prof-name" id="profileName">—</div>
+            <div class="prof-country-flag" id="profCountryFlag">🇯🇵</div>
+          </div>
+          <div class="prof-handle" id="profileHandle">@—</div>
+          <div class="prof-tagline" id="profileBio"></div>
+          <div class="prof-style-chips" id="profStyles"></div>
+        </div>
+      </div>
+
+      <!-- ② STATUS BAR -->
+      <div class="prof-status">
+        <div class="prof-stat">
+          <div class="prof-stat-num accent" id="pstatGP">0</div>
+          <div class="prof-stat-label">⚡ Gpoints</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-num" id="pstatWorks">0</div>
+          <div class="prof-stat-label">📦 Builds</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-num gold" id="pstatFollowers">—</div>
+          <div class="prof-stat-label">👥 Followers</div>
+        </div>
+      </div>
+      <div class="prof-rank-bar">
+        <div class="prof-rank-item">🌐 Global Rank <span class="prof-rank-num" id="profGlobalRank">#—</span></div>
+        <div class="prof-rank-item">🏴 Country Rank <span class="prof-rank-num" id="profCountryRank">#—</span></div>
+      </div>
+
+      <!-- ③ GLOBAL EVALUATION -->
+      <div class="prof-block">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">🌍</span> GLOBAL EVALUATION
+          </div>
+          <span class="prof-block-more" onclick="toggleFlagDetail()" id="flagDetailToggle">▼ DETAILS</span>
+        </div>
+        <div class="prof-global-hero">
+          <div class="prof-globe">🌍</div>
+          <div>
+            <div class="prof-liked-count" id="profLikedIn">0</div>
+            <div class="prof-liked-label">COUNTRIES REACHED</div>
           </div>
         </div>
-        <button class="btn-outline" style="width:auto;padding:6px 14px;margin-top:0" onclick="openModal('editProfileModal')">✏ EDIT</button>
+        <div class="prof-flags-scroll" id="profFlagStrip"></div>
+        <div class="prof-flag-expand" id="flagDetailPanel">
+          <div class="prof-flag-bar-list" id="flagBarList"></div>
+        </div>
       </div>
-      <div class="profile-tabs">
-        <div class="ptab active" onclick="setPTab('builds',this)">BUILDS</div>
-        <div class="ptab" onclick="setPTab('flags',this)">COUNTRIES</div>
-        <div class="ptab" onclick="setPTab('achievements',this)">ACHIEVEMENTS</div>
+
+      <!-- ④ BADGES -->
+      <div class="prof-block">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">🏆</span> ACHIEVEMENTS
+          </div>
+        </div>
+        <div class="prof-badges-scroll" id="profBadges"></div>
       </div>
-    </div>
-    <div class="profile-content">
-      <div id="ptab-builds"></div>
-      <div id="ptab-flags" style="display:none"></div>
-      <div id="ptab-achievements" style="display:none"></div>
+
+      <!-- ⑤ FEATURED BUILD -->
+      <div class="prof-block" id="profFeaturedSection">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">🔥</span> FEATURED BUILD
+          </div>
+        </div>
+        <div id="profFeatured"></div>
+      </div>
+
+      <!-- ⑥ BUILDS GRID -->
+      <div class="prof-block">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">📸</span> BUILDS
+            <span id="pstatBuildsCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0"></span>
+          </div>
+        </div>
+        <div class="builds-grid-v3" id="ptab-builds"></div>
+      </div>
+
+      <!-- ⑦ COMMUNITY + ⑧ RANKING -->
+      <div class="prof-two-col">
+        <div class="prof-mini-block">
+          <div class="prof-mini-title">🤝 GLOBAL SUPPORT</div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">GP Given</span>
+            <span class="prof-mini-val" id="profGivenGP">0</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">Flags Sent</span>
+            <span class="prof-mini-val" id="profFlagsGiven">0</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">Countries</span>
+            <span class="prof-mini-val" id="profCountriesSupported">0</span>
+          </div>
+        </div>
+        <div class="prof-mini-block">
+          <div class="prof-mini-title">📊 RANKING</div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">🌐 Global</span>
+            <span class="prof-mini-val gold" id="profGlobalRank2">#—</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">🏴 Country</span>
+            <span class="prof-mini-val gold" id="profCountryRank2">#—</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">🌍 Countries</span>
+            <span class="prof-mini-val" id="pstatCountries">0</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
-
 <!-- ABOUT -->
 <div class="page" id="page-about">
   <div class="about-wrap">
@@ -1074,6 +1509,39 @@ nav::after{
       <button class="modal-close" onclick="closeModal('postDetailModal')">✕</button>
     </div>
     <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shareModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">📤 SHARE YOUR REACH</span>
+      <button class="modal-close" onclick="closeModal('shareModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Share card preview -->
+      <div class="share-card" id="shareCardPreview">
+        <div class="share-card-logo">PLAMO<span>X</span></div>
+        <div class="share-card-title">🌍 My Build Got Likes From</div>
+        <div class="share-card-flags" id="shareCardFlags">—</div>
+        <div class="share-card-count" id="shareCardCount">0</div>
+        <div class="share-card-label">COUNTRIES</div>
+        <div class="share-hashtags" id="shareCardHashtags">#PLAMOX #Gunpla</div>
+      </div>
+      <!-- Copy text -->
+      <div style="margin-top:16px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">SNS COPY TEXT</div>
+      <div class="share-copy-text" id="shareCopyText">—</div>
+      <!-- Buttons -->
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn-submit" style="flex:1" onclick="copyShareText()">📋 COPY TEXT</button>
+        <button class="btn-social" style="flex:1;margin:0" onclick="shareToTwitter()">𝕏 POST TO X</button>
+      </div>
+      <!-- Badge unlocks -->
+      <div style="margin-top:20px">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">🏆 YOUR ACHIEVEMENTS</div>
+        <div id="shareAchievements" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2016,7 +2484,16 @@ function renderRanking(posts){
     </div>`).join('') || '<div class="feed-empty">No data yet</div>';
 }
 
-// ── PROFILE ────────────────────────────────────────────
+// ── PROFILE v2 ─────────────────────────────────────────
+const BADGES_DEF = [
+  {key:'first', req:1,  icon:'🌍', name:'First Global Like',  desc:'海外から初めて評価された'},
+  {key:'b5',    req:5,  icon:'🌎', name:'5 Countries',        desc:'5カ国から評価された'},
+  {key:'b10',   req:10, icon:'🌏', name:'10 Countries',       desc:'10カ国から評価された'},
+  {key:'b20',   req:20, icon:'🏆', name:'World Builder',      desc:'20カ国から評価された'},
+  {key:'b50',   req:50, icon:'🌐', name:'Planet Builder',     desc:'50カ国から評価された'},
+  {key:'b100',  req:100,icon:'⭐', name:'Legendary Builder',  desc:'100カ国から評価された'},
+];
+
 async function renderProfile(){
   if(!currentUser||!db) return;
   userData = await loadUserData(currentUser.uid);
@@ -2024,80 +2501,226 @@ async function renderProfile(){
 
   document.getElementById('profileNotLoggedIn').style.display = 'none';
   document.getElementById('profileLoggedIn').style.display   = '';
+
+  // ① HEADER
   document.getElementById('profileAvatar').innerHTML = userData.photoURL
     ? `<img src="${userData.photoURL}">` : '👤';
   document.getElementById('profileName').textContent   = userData.displayName||'Builder';
-  document.getElementById('profileHandle').textContent = '@' + (userData.displayName||'builder').toLowerCase().replace(/\s+/g,'_');
+  document.getElementById('profileHandle').textContent = '@'+(userData.displayName||'builder').toLowerCase().replace(/\s+/g,'_');
   document.getElementById('profileBio').textContent    = userData.bio||'';
+  document.getElementById('profCountryFlag').textContent = getCountryFlag(userData.country||'JP');
+
+  // Style chips from bio keywords
+  const styleTags = ['Weathering','Kitbash','Diorama','Custom','Scratch','Painting','Airbrush','Panel Line','LED','Decal'];
+  const bio = (userData.bio||'').toLowerCase();
+  const matched = styleTags.filter(s=>bio.includes(s.toLowerCase()));
+  document.getElementById('profStyles').innerHTML = matched.map(s=>
+    `<span class="prof-style-chip">${s}</span>`).join('');
 
   // My posts
   const q = query(collection(db,'posts'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
   const snap = await getDocs(q);
   const myPosts = snap.docs.map(d=>({id:d.id,...d.data()}));
   const totalGP = myPosts.reduce((s,p)=>s+(p.gp||0),0);
-  const allFlags = myPosts.flatMap(p=>Object.keys(p.flagsFrom||{}));
-  const uniqueFlags = [...new Set(allFlags)];
 
+  // Collect all flags + counts per country
+  const flagCounts = {};
+  myPosts.forEach(p => {
+    Object.entries(p.flagsFrom||{}).forEach(([code,cnt])=>{
+      flagCounts[code] = (flagCounts[code]||0) + cnt;
+    });
+  });
+  const uniqueFlags = Object.keys(flagCounts);
+  const flagsSorted = Object.entries(flagCounts).sort((a,b)=>b[1]-a[1]);
+
+  // ② STATUS BAR
+  document.getElementById('pstatGP').textContent       = totalGP >= 1000 ? (totalGP/1000).toFixed(1)+'K' : totalGP;
   document.getElementById('pstatWorks').textContent    = myPosts.length;
-  document.getElementById('pstatGP').textContent       = totalGP;
+  document.getElementById('pstatFollowers').textContent = '—';
   document.getElementById('pstatCountries').textContent = uniqueFlags.length;
+  document.getElementById('pstatBuildsCount').textContent = ` (${myPosts.length})`;
 
-  // Builds tab
-  document.getElementById('ptab-builds').innerHTML =
-    `<div class="works-grid">${myPosts.map(p=>`
-      <div class="work-thumb" onclick="openPostDetail('${p.id}')">
-        ${p.imageURL ? `<img src="${p.imageURL}" loading="lazy">` : '<div class="work-thumb-empty">🔧</div>'}
-        <div class="work-thumb-overlay">⚡${p.gp||0}</div>
-      </div>`).join('')}
-    </div>` || '<div class="feed-empty">No builds yet</div>';
+  // Rank
+  if(db){
+    try {
+      const allSnap = await getDocs(query(collection(db,'posts'), orderBy('gp','desc'), limit(200)));
+      const allPosts = allSnap.docs.map(d=>d.data());
+      const builderGP = {};
+      allPosts.forEach(p=>{ builderGP[p.uid]=(builderGP[p.uid]||0)+(p.gp||0); });
+      const sorted = Object.entries(builderGP).sort((a,b)=>b[1]-a[1]);
+      const gr = sorted.findIndex(([uid])=>uid===currentUser.uid)+1;
+      const grText = gr>0 ? `#${gr}` : '#—';
+      document.getElementById('profGlobalRank').textContent  = grText;
+      document.getElementById('profGlobalRank2').textContent = grText;
+      const myCountry = userData.country||'JP';
+      const countryGP = {};
+      allPosts.filter(p=>p.country===myCountry).forEach(p=>{ countryGP[p.uid]=(countryGP[p.uid]||0)+(p.gp||0); });
+      const crSorted = Object.entries(countryGP).sort((a,b)=>b[1]-a[1]);
+      const cr = crSorted.findIndex(([uid])=>uid===currentUser.uid)+1;
+      const crText = cr>0 ? `#${cr}` : '#—';
+      document.getElementById('profCountryRank').textContent  = crText;
+      document.getElementById('profCountryRank2').textContent = crText;
+    } catch(e){}
+  }
 
-  // Flags tab
-  const collectedFlags = userData.collectedFlags || {};
-  document.getElementById('ptab-flags').innerHTML =
-    `<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">
-      ${uniqueFlags.length} / ${COUNTRIES.length} COUNTRIES
-    </div>
-    <div class="flags-grid">
-      ${COUNTRIES.map(c=>{
-        const cnt = collectedFlags[c.code]||0;
-        return `<div class="flag-cell${cnt>0?' collected':' locked'}" title="${c.name}${cnt?' · '+cnt+' flags':''}">
-          <div class="fc-flag">${c.flag}</div>
-          ${cnt ? `<div class="fc-count">${cnt}</div>` : ''}
-        </div>`;
-      }).join('')}
+  // ③ GLOBAL EVALUATION
+  document.getElementById('profLikedIn').textContent = uniqueFlags.length;
+  // Flag strip (scrollable, with count)
+  document.getElementById('profFlagStrip').innerHTML = flagsSorted.slice(0,20).map(([code,cnt])=>
+    `<div class="prof-flag-btn" title="${getCountryName(code)}: ${cnt} flags">
+      <span>${getCountryFlag(code)}</span>
+      <span class="prof-flag-cnt">${cnt}</span>
+    </div>`
+  ).join('') || '<span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Post builds to collect flags!</span>';
+  // Bar chart detail
+  const maxCnt = flagsSorted[0]?.[1]||1;
+  document.getElementById('flagBarList').innerHTML = flagsSorted.slice(0,15).map(([code,cnt])=>
+    `<div class="prof-flag-bar-row">
+      <span class="prof-flag-bar-flag">${getCountryFlag(code)}</span>
+      <span class="prof-flag-bar-name">${getCountryName(code)}</span>
+      <div class="prof-flag-bar-track">
+        <div class="prof-flag-bar-fill" style="width:${Math.round(cnt/maxCnt*100)}%"></div>
+      </div>
+      <span class="prof-flag-bar-num">${cnt}</span>
+    </div>`
+  ).join('');
+
+  // ④ BADGES
+  document.getElementById('profBadges').innerHTML = BADGES_DEF.map(b=>{
+    const unlocked = uniqueFlags.length >= b.req;
+    return `<div class="prof-badge-card${unlocked?' unlocked':' locked'}">
+      <div class="prof-badge-icon">${b.icon}</div>
+      <div class="prof-badge-name">${b.name}</div>
+      <div class="prof-badge-req">${b.req}</div>
     </div>`;
+  }).join('');
 
-  // Achievements tab
-  const BADGES = [
-    {key:'first',req:1, name:'FIRST CONTACT',desc:'First flag received'},
-    {key:'b5',  req:5, name:'5 COUNTRIES',   desc:'Flags from 5 countries'},
-    {key:'b10', req:10,name:'WORLD BUILDER', desc:'Flags from 10 countries'},
-    {key:'b20', req:20,name:'GLOBAL REACH',  desc:'Flags from 20 countries'},
-    {key:'b50', req:50,name:'PLANET BUILDER',desc:'Flags from 50 countries'},
-  ];
-  document.getElementById('ptab-achievements').innerHTML =
-    `<div class="ach-grid">${BADGES.map(b=>{
-      const unlocked = uniqueFlags.length >= b.req;
-      const mosaicFlags = COUNTRIES.slice(0,20).map(c=>`<div class="ach-mosaic-flag">${c.flag}</div>`).join('');
-      return `<div class="ach-card${unlocked?' unlocked':' locked'}">
-        <div class="ach-mosaic">${mosaicFlags}<div class="ach-mosaic-overlay"></div>
-          <div class="ach-num">${b.req}</div>
-        </div>
-        <div class="ach-info">
-          <div class="ach-name">${b.name}</div>
-          <div class="ach-desc">${b.desc}</div>
+  // ⑤ FEATURED BUILD (highest GP)
+  const sorted = [...myPosts].sort((a,b)=>(b.gp||0)-(a.gp||0));
+  const featured = sorted[0];
+  if(featured){
+    const fFlags = Object.keys(featured.flagsFrom||{});
+    document.getElementById('profFeatured').innerHTML = `
+      <div class="featured-v3" onclick="openPostDetail('${featured.id}')">
+        ${featured.imageURL
+          ? `<img class="featured-v3-img" src="${featured.imageURL}" loading="lazy">`
+          : `<div class="featured-v3-img-placeholder">🔧</div>`}
+        <div class="featured-v3-body">
+          <div class="featured-v3-label">🔥 FEATURED BUILD</div>
+          <div class="featured-v3-title">${featured.title}</div>
+          <div class="featured-v3-stats">
+            <div class="featured-v3-stat">⚡ <strong>${(featured.gp||0).toLocaleString()}</strong> Gpoints</div>
+            <div class="featured-v3-stat">🌍 <strong>${fFlags.length}</strong> Countries</div>
+            ${featured.scale?`<div class="featured-v3-stat">📐 ${featured.scale}</div>`:''}
+          </div>
         </div>
       </div>`;
-    }).join('')}</div>`;
+  } else {
+    document.getElementById('profFeatured').innerHTML =
+      `<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);padding:8px 0">Post your first build to feature it here!</div>`;
+  }
+
+  // ⑥ BUILDS GRID
+  document.getElementById('ptab-builds').innerHTML = myPosts.length
+    ? myPosts.map(p=>`
+      <div class="build-thumb-v3" onclick="openPostDetail('${p.id}')">
+        ${p.imageURL
+          ? `<img src="${p.imageURL}" loading="lazy">`
+          : `<div class="build-thumb-v3-empty">🔧</div>`}
+        <div class="build-thumb-v3-overlay">
+          <span>⚡${p.gp||0}</span>
+          <span>🌍${Object.keys(p.flagsFrom||{}).length}</span>
+        </div>
+      </div>`).join('')
+    : `<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);padding:20px 0;grid-column:1/-1">No builds yet — post your first!</div>`;
+
+  // ⑦ COMMUNITY
+  document.getElementById('profGivenGP').textContent         = userData.gpGiven||0;
+  document.getElementById('profFlagsGiven').textContent      = userData.flagsGiven||0;
+  document.getElementById('profCountriesSupported').textContent = userData.countriesSupported||0;
+
+  // Cache for share modal
+  window._profileCache = { myPosts, uniqueFlags, flagsSorted, totalGP, userData };
 }
 
-window.setPTab = function(tab, el){
-  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['builds','flags','achievements'].forEach(t=>{
-    document.getElementById(`ptab-${t}`).style.display = t===tab?'':'none';
-  });
+// Toggle flag detail panel
+window.toggleFlagDetail = function(){
+  const panel  = document.getElementById('flagDetailPanel');
+  const toggle = document.getElementById('flagDetailToggle');
+  const isOpen = panel.classList.toggle('open');
+  toggle.textContent = isOpen ? '▲ CLOSE' : '▼ DETAILS';
 }
+
+
+// ── SHARE FUNCTIONS ──────────────────────────────────
+window.openShareModal = function(){
+  const cache = window._profileCache;
+  if(!cache){ toast('プロフィールを読み込んでください'); return; }
+  const { uniqueFlags, totalGP, userData: ud } = cache;
+
+  // Flag emojis (top 8)
+  const topFlags = uniqueFlags.slice(0,8).map(getCountryFlag).join(' ');
+  document.getElementById('shareCardFlags').textContent = topFlags || '—';
+  document.getElementById('shareCardCount').textContent = uniqueFlags.length;
+
+  // Hashtags
+  const allTags = (cache.myPosts||[]).flatMap(p=>p.tags||[]).slice(0,3);
+  const hashtags = ['#PLAMOX','#Gunpla',...allTags.map(t=>`#${t}`)].slice(0,5).join(' ');
+  document.getElementById('shareCardHashtags').textContent = hashtags;
+
+  // Copy text
+  const copyText = `🌍 My Build Got Likes From\n${topFlags}\n${uniqueFlags.length} Countries\n\nMy build got likes from ${uniqueFlags.length} countries 🌍\n${hashtags}\nhttps://tk6o1.github.io/plamox/`;
+  document.getElementById('shareCopyText').textContent = copyText;
+  window._shareText = copyText;
+
+  // Unlocked achievements
+  const unlockedBadges = BADGES_DEF.filter(b => uniqueFlags.length >= b.req);
+  document.getElementById('shareAchievements').innerHTML = unlockedBadges.map(b=>`
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid rgba(255,200,64,0.3);padding:6px 10px;clip-path:var(--clip-sm)">
+      <span style="font-size:16px">${b.icon}</span>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--gold)">${b.name}</span>
+      <button onclick="shareAchievement('${b.name}','${b.icon}',${b.req})" style="background:transparent;border:none;cursor:pointer;color:var(--accent);font-size:10px;margin-left:4px">シェア</button>
+    </div>`).join('') || '<span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">実績を解除するとここに表示されます</span>';
+
+  openModal('shareModal');
+}
+
+window.copyShareText = function(){
+  if(navigator.clipboard && window._shareText){
+    navigator.clipboard.writeText(window._shareText).then(()=>toast('📋 コピーしました！'));
+  } else {
+    // Fallback
+    const el = document.getElementById('shareCopyText');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    toast('📋 コピーしました！');
+  }
+}
+
+window.shareToTwitter = function(){
+  const cache = window._profileCache;
+  if(!cache) return;
+  const { uniqueFlags } = cache;
+  const topFlags = uniqueFlags.slice(0,5).map(getCountryFlag).join('');
+  const text = encodeURIComponent(
+    `My build got likes from ${uniqueFlags.length} countries 🌍 ${topFlags}\n#PLAMOX #Gunpla\nhttps://tk6o1.github.io/plamox/`
+  );
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+}
+
+window.shareAchievement = function(name, icon, req){
+  const text = encodeURIComponent(
+    `${icon} Unlocked "${name}" on PLAMOX!\nLiked in ${req}+ countries 🌍\n#PLAMOX #Gunpla\nhttps://tk6o1.github.io/plamox/`
+  );
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+}
+
+// legacy stub (no longer used but keep to avoid errors)
+window.setPTab = function(tab, el){}
+
 
 // ── EDIT PROFILE ──────────────────────────────────────
 function buildCountrySelect(){
