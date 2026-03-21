@@ -1007,13 +1007,81 @@ nav::after{
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Counter badge */
-.counter-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:18px;height:18px;padding:0 4px;
-  background:var(--accent);color:var(--bg);
-  font-family:var(--font-mono);font-size:9px;font-weight:700;
-  border-radius:2px;margin-left:4px;
+/* ══ DASHBOARD STATS ══ */
+.dash-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.dash-card{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:14px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.dash-card:hover{border-color:var(--border2);box-shadow:0 0 16px rgba(0,229,255,0.05)}
+.dash-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.dash-world::before{background:linear-gradient(90deg,var(--accent),var(--green))}
+.dash-eval::before {background:linear-gradient(90deg,var(--purple),var(--accent))}
+.dash-gp::before   {background:linear-gradient(90deg,var(--gold),#ff8c00)}
+.dash-daily::before{background:linear-gradient(90deg,#ff8c00,var(--warm))}
+
+.dash-card-top{
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:8px;
+}
+.dash-icon{font-size:15px}
+.dash-label{
+  font-family:var(--font-mono);font-size:8px;
+  color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;
+}
+.dash-num{
+  font-family:var(--font-cond);font-size:32px;font-weight:900;
+  color:var(--accent);line-height:1;margin-bottom:4px;
+}
+.dash-num-gold{color:var(--gold)}
+.dash-sub{
+  font-family:var(--font-mono);font-size:9px;
+  color:var(--muted);letter-spacing:0.5px;margin-bottom:8px;
+}
+.dash-bar-wrap{
+  height:4px;background:var(--bg3);border-radius:0;overflow:hidden;
+}
+.dash-bar-fill{
+  height:100%;border-radius:0;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.dash-bar-accent{background:linear-gradient(90deg,var(--accent),var(--green));box-shadow:0 0 6px rgba(0,229,255,0.5)}
+.dash-bar-gold  {background:linear-gradient(90deg,var(--gold),#ff8c00);box-shadow:0 0 6px rgba(255,200,64,0.5)}
+
+.dash-pips{
+  display:flex;gap:5px;margin-bottom:6px;
+}
+.dash-pip{
+  flex:1;height:8px;border-radius:1px;
+  background:rgba(255,200,64,0.15);
+  border:1px solid rgba(255,200,64,0.2);
+  transition:all 0.3s;
+}
+.dash-pip.active{
+  background:var(--gold);
+  border-color:var(--gold);
+  box-shadow:0 0 6px rgba(255,200,64,0.6);
+}
+
+.dash-flag-mini{
+  display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;
+}
+.dash-flag-mini span{font-size:14px;line-height:1}
+
+@media(max-width:900px){
+  .dash-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .dash-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .dash-card{padding:12px}
+  .dash-num{font-size:26px}
 }
 </style>
 </head>
@@ -1074,6 +1142,70 @@ nav::after{
   </div>
 
   <div class="feed-layout">
+    <!-- ══ DASHBOARD STATS（常時表示） ══ -->
+    <div id="dashStats" style="grid-column:1/-1;margin-bottom:8px">
+      <div class="dash-grid">
+
+        <!-- 世界の参加人口 -->
+        <div class="dash-card dash-world">
+          <div class="dash-card-top">
+            <span class="dash-icon">🌍</span>
+            <span class="dash-label">WORLD BUILDERS</span>
+          </div>
+          <div class="dash-num" id="dashBuilders">—</div>
+          <div class="dash-sub" id="dashCountriesActive">— countries active</div>
+          <div class="dash-bar-wrap">
+            <div class="dash-bar-fill dash-bar-accent" id="dashBuildersBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- 自分が獲得した評価数（ログイン時のみ数値入る） -->
+        <div class="dash-card dash-eval">
+          <div class="dash-card-top">
+            <span class="dash-icon">🏴</span>
+            <span class="dash-label">MY FLAGS RECEIVED</span>
+          </div>
+          <div class="dash-num" id="dashMyFlags">—</div>
+          <div class="dash-sub" id="dashMyFlagSub">from — countries</div>
+          <div class="dash-flag-mini" id="dashFlagMini"></div>
+        </div>
+
+        <!-- 獲得GPの数 -->
+        <div class="dash-card dash-gp">
+          <div class="dash-card-top">
+            <span class="dash-icon">⚡</span>
+            <span class="dash-label">MY TOTAL GP</span>
+          </div>
+          <div class="dash-num dash-num-gold" id="dashMyGP">—</div>
+          <div class="dash-sub" id="dashGPRank">Global Rank —</div>
+          <div class="dash-bar-wrap">
+            <div class="dash-bar-fill dash-bar-gold" id="dashGPBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- 本日の評価可能GP数 -->
+        <div class="dash-card dash-daily">
+          <div class="dash-card-top">
+            <span class="dash-icon">🎯</span>
+            <span class="dash-label">TODAY'S GP</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <div class="dash-num dash-num-gold" id="dashGPRemain">5</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">/5</div>
+          </div>
+          <div class="dash-pips" id="dashPips">
+            <div class="dash-pip active" id="dp1"></div>
+            <div class="dash-pip active" id="dp2"></div>
+            <div class="dash-pip active" id="dp3"></div>
+            <div class="dash-pip active" id="dp4"></div>
+            <div class="dash-pip active" id="dp5"></div>
+          </div>
+          <div class="dash-sub" id="dashGPResetTime">Resets at midnight</div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- GP Banner (shown when logged in, above feed on mobile too) -->
     <div id="gpBanner" style="display:none;grid-column:1/-1;margin-bottom:4px">
       <div style="
@@ -1991,6 +2123,7 @@ function updateGPDisplay(){
     }
   }
   document.getElementById('gpBanner').style.display = '';
+  updateDashGP();
 }
 
 // ── AUTH ACTIONS ───────────────────────────────────────
@@ -2417,11 +2550,119 @@ window.openPostDetail = async function(postId){
 
 // ── STATS / SIDEBAR ────────────────────────────────────
 function updateStats(posts){
+  // Hero stats（未ログイン時のhero section）
   document.getElementById('statPosts').textContent = posts.length;
   const uids = [...new Set(posts.map(p=>p.uid))];
   document.getElementById('statUsers').textContent = uids.length;
   const countries = [...new Set(posts.flatMap(p=>Object.keys(p.flagsFrom||{})))];
   document.getElementById('statCountries').textContent = countries.length;
+
+  // ── DASHBOARD STATS ──
+  updateDashboard(posts);
+}
+
+function updateDashboard(posts){
+  // ① 世界の参加人口
+  const uniqueBuilders = [...new Set(posts.map(p=>p.uid))];
+  const activeCountries = [...new Set(posts.flatMap(p=>Object.keys(p.flagsFrom||{})))];
+  const builderNum = document.getElementById('dashBuilders');
+  if(builderNum){
+    builderNum.textContent = uniqueBuilders.length >= 1000
+      ? (uniqueBuilders.length/1000).toFixed(1)+'K'
+      : uniqueBuilders.length;
+    document.getElementById('dashCountriesActive').textContent =
+      `${activeCountries.length} countries active`;
+    // バーは最大100人を100%として表示
+    document.getElementById('dashBuildersBar').style.width =
+      Math.min(uniqueBuilders.length/100*100,100)+'%';
+  }
+
+  // ② 自分が獲得した評価数（ログイン済みのとき）
+  if(currentUser && userData){
+    const myPosts = posts.filter(p=>p.uid===currentUser.uid);
+    const myFlagCounts = {};
+    myPosts.forEach(p=>{
+      Object.entries(p.flagsFrom||{}).forEach(([code,cnt])=>{
+        myFlagCounts[code]=(myFlagCounts[code]||0)+cnt;
+      });
+    });
+    const totalFlags = Object.values(myFlagCounts).reduce((s,v)=>s+v,0);
+    const flagCountries = Object.keys(myFlagCounts).length;
+    const flagsSorted = Object.entries(myFlagCounts).sort((a,b)=>b[1]-a[1]);
+    document.getElementById('dashMyFlags').textContent = totalFlags>=1000
+      ? (totalFlags/1000).toFixed(1)+'K' : totalFlags||'0';
+    document.getElementById('dashMyFlagSub').textContent =
+      `from ${flagCountries} ${flagCountries===1?'country':'countries'}`;
+    document.getElementById('dashFlagMini').innerHTML =
+      flagsSorted.slice(0,8).map(([code])=>
+        `<span title="${getCountryName(code)}">${getCountryFlag(code)}</span>`
+      ).join('');
+
+    // ③ 獲得GPの数
+    const myTotalGP = myPosts.reduce((s,p)=>s+(p.gp||0),0);
+    document.getElementById('dashMyGP').textContent = myTotalGP>=1000
+      ? (myTotalGP/1000).toFixed(1)+'K' : myTotalGP;
+    // ランク（全体のGP分布で位置を算出）
+    const allGPs = posts.reduce((acc,p)=>{
+      acc[p.uid]=(acc[p.uid]||0)+(p.gp||0); return acc;
+    },{});
+    const sorted = Object.values(allGPs).sort((a,b)=>b-a);
+    const maxGP = sorted[0]||1;
+    document.getElementById('dashGPBar').style.width = Math.min(myTotalGP/maxGP*100,100)+'%';
+    const myRank = sorted.filter(g=>g>myTotalGP).length+1;
+    document.getElementById('dashGPRank').textContent = `Global Rank #${myRank}`;
+  } else {
+    // 未ログイン時はグローバル合計を表示
+    const totalFlagsAll = posts.reduce((s,p)=>
+      s+Object.values(p.flagsFrom||{}).reduce((a,b)=>a+b,0),0);
+    document.getElementById('dashMyFlags').textContent = totalFlagsAll>=1000
+      ? (totalFlagsAll/1000).toFixed(1)+'K' : totalFlagsAll;
+    document.getElementById('dashMyFlagSub').textContent = 'total flags sent';
+    const topFlags = [...new Set(
+      posts.flatMap(p=>Object.keys(p.flagsFrom||{}))
+    )].slice(0,8);
+    document.getElementById('dashFlagMini').innerHTML =
+      topFlags.map(code=>`<span>${getCountryFlag(code)}</span>`).join('');
+
+    const totalGPAll = posts.reduce((s,p)=>s+(p.gp||0),0);
+    document.getElementById('dashMyGP').textContent = totalGPAll>=1000
+      ? (totalGPAll/1000).toFixed(1)+'K' : totalGPAll;
+    document.getElementById('dashGPRank').textContent = 'total GP distributed';
+    document.getElementById('dashGPBar').style.width = '60%';
+  }
+
+  // ④ 本日のGP残量（updateGPDisplay と連動）
+  updateDashGP();
+}
+
+function updateDashGP(){
+  const gp = getGPRemaining();
+  const remain = document.getElementById('dashGPRemain');
+  if(!remain) return;
+  remain.textContent = gp;
+  // pips
+  for(let i=1;i<=5;i++){
+    const pip = document.getElementById('dp'+i);
+    if(pip){
+      pip.classList.toggle('active', i<=gp);
+    }
+  }
+  // リセット時刻（日本時間 or ローカル深夜0時）
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24,0,0,0);
+  const diffH = Math.floor((midnight-now)/3600000);
+  const diffM = Math.floor(((midnight-now)%3600000)/60000);
+  const resetEl = document.getElementById('dashGPResetTime');
+  if(resetEl){
+    if(gp<=0){
+      resetEl.textContent = `Resets in ${diffH}h ${diffM}m`;
+      resetEl.style.color = 'var(--warm)';
+    } else {
+      resetEl.textContent = `${gp} left today`;
+      resetEl.style.color = 'var(--muted)';
+    }
+  }
 }
 
 function renderSidebarCountries(posts){
