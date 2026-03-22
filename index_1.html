@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLAMOX — Where Your Build Meets the World</title>
+<meta name="google-site-verification" content="google53bc67e5ddfb0ddf">
+<meta name="description" content="世界中のモデラーが作品を見せ合い、国旗でリスペクトを送るグローバル模型SNS。">
+<meta name="theme-color" content="#04060a">
+<meta property="og:title" content="PLAMOX — Where Your Build Meets the World">
+<meta property="og:description" content="Build · Share · Connect — グローバル模型コミュニティ">
+<meta property="og:image" content="https://plamoxofficial.web.app/ogp.png">
+<meta property="og:url" content="https://plamoxofficial.web.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://plamoxofficial.web.app/ogp.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2304060a'/><text x='50%' y='55%' font-family='Arial Black' font-weight='900' font-size='14' fill='%2300e5ff' text-anchor='middle' dominant-baseline='middle'>PX</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@700;900&family=Roboto+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   PLAMOX — Design System (Mecha / Game Dark UI)
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:#04060a; --bg2:#080c12; --bg3:#0d1320; --bg4:#12192a;
+  --ink:#ccd8f0; --ink2:#8899bb; --muted:#445566;
+  --border:#162030; --border2:#1e3048;
+  --accent:#00e5ff; --accent2:#0088bb;
+  --green:#39ff90; --purple:#9b59ff; --warm:#ff4d1a; --gold:#ffc840;
+  --font-head:'Orbitron',sans-serif;
+  --font-body:'Roboto',sans-serif;
+  --font-mono:'Roboto Mono',monospace;
+  --font-cond:'Roboto Condensed',sans-serif;
+  --clip-sm: polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  --clip-md: polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+  --clip-lg: polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);background:var(--bg);color:var(--ink);
+  min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,229,255,0.025) 40px),
+             repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,229,255,0.015) 40px);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,229,255,0.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  background:rgba(4,6,10,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border2);
+}
+nav::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--green),var(--purple),transparent);
+  opacity:0.4;
+}
+.nav-logo{
+  font-family:var(--font-head);font-size:17px;font-weight:900;
+  color:var(--ink);letter-spacing:3px;cursor:pointer;user-select:none;
+}
+.nav-logo span{color:var(--accent)}
+.nav-tagline{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-left:14px}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nav-link{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;
+  color:var(--ink2);padding:6px 12px;cursor:pointer;
+  border:1px solid transparent;transition:all 0.2s;text-transform:uppercase;
+  clip-path:var(--clip-sm);
+}
+.nav-link:hover,.nav-link.active{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.06)}
+.nav-right{display:flex;align-items:center;gap:10px}
+
+/* GP Badge in nav */
+.nav-gp{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:9px;color:var(--gold);
+  background:rgba(255,200,64,0.08);border:1px solid rgba(255,200,64,0.2);
+  padding:5px 10px;clip-path:var(--clip-sm);
+}
+.nav-gp-num{font-size:12px;font-weight:700}
+
+/* Auth button */
+.btn-auth{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:7px 16px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+}
+.btn-auth:hover{background:#33eeff;box-shadow:0 0 16px rgba(0,229,255,0.4)}
+
+.btn-post{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--bg);background:var(--green);border:none;cursor:pointer;
+  padding:7px 14px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+}
+.btn-post:hover{background:#5fffaa;box-shadow:0 0 16px rgba(57,255,144,0.4)}
+
+/* Avatar */
+.nav-avatar{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--accent);cursor:pointer;
+  object-fit:cover;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;overflow:hidden;
+}
+
+/* Lang switcher */
+.lang-switcher{position:relative}
+.lang-btn-main{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);
+  padding:5px 8px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.lang-btn-main:hover{color:var(--accent);border-color:rgba(0,229,255,0.3)}
+.lang-arrow{transition:transform 0.2s;font-size:8px}
+.lang-switcher.open .lang-arrow{transform:rotate(180deg)}
+.lang-dropdown{
+  position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--bg3);border:1px solid var(--border2);
+  padding:4px;min-width:170px;z-index:300;display:none;
+  clip-path:var(--clip-md);box-shadow:0 16px 40px rgba(0,0,0,0.7);
+}
+.lang-switcher.open .lang-dropdown{display:block;animation:fadeIn 0.15s ease}
+.lang-option{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  font-family:var(--font-mono);font-size:10px;color:var(--ink2);cursor:pointer;transition:background 0.15s;
+}
+.lang-option:hover{background:var(--bg4);color:var(--accent)}
+.lang-option.active{background:rgba(0,229,255,0.1);color:var(--accent)}
+.lang-native{color:var(--muted);font-size:9px;margin-left:auto}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-top:56px;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ── FEED PAGE ── */
+.feed-layout{
+  display:grid;grid-template-columns:1fr 320px;
+  gap:28px;max-width:1100px;margin:0 auto;padding:24px 28px 60px;
+}
+.feed-main{}
+.feed-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.feed-title{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px}
+.feed-sort{display:flex;gap:6px}
+.sort-btn{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:1px;
+  color:var(--muted);background:transparent;border:1px solid var(--border);
+  padding:4px 8px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.sort-btn.active,.sort-btn:hover{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.05)}
+
+/* ── POST CARD ── */
+.post{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);margin-bottom:16px;position:relative;overflow:hidden;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.post:hover{border-color:rgba(0,229,255,0.2);box-shadow:0 0 24px rgba(0,229,255,0.06)}
+.post::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--green));opacity:0.5;
+}
+.post-img-wrap{position:relative;width:100%;padding-top:56.25%;overflow:hidden;background:var(--bg3)}
+.post-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.post-img-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,0) 4px);
+  pointer-events:none;
+}
+.post-no-img{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-size:32px;color:rgba(0,229,255,0.15);letter-spacing:4px;
+}
+.post-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.post-user{display:flex;align-items:center;gap:10px}
+.post-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;
+}
+.post-avatar img{width:100%;height:100%;object-fit:cover}
+.post-username{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:0.5px}
+.post-flag-origin{font-size:14px;margin-left:2px}
+.post-time{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.post-body{padding:4px 16px 12px}
+.post-work-title{font-family:var(--font-head);font-size:15px;color:var(--ink);letter-spacing:1px;margin-bottom:6px}
+.post-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.post-tag{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;
+  color:var(--muted);background:var(--bg3);border:1px solid var(--border);
+  padding:2px 6px;clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,0 100%);
+}
+.post-tag.scale{color:var(--green);border-color:rgba(57,255,144,0.2);background:rgba(57,255,144,0.05)}
+.post-tag.cat{color:var(--purple);border-color:rgba(155,89,255,0.2);background:rgba(155,89,255,0.05)}
+.post-desc{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:8px}
+.post-point{
+  font-size:13px;color:var(--ink);background:rgba(0,229,255,0.05);
+  border-left:2px solid var(--accent);padding:6px 10px;margin-bottom:10px;
+  font-style:italic;
+}
+
+/* Likes from countries */
+.post-fr{padding:8px 16px;border-top:1px solid var(--border)}
+.post-fr-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:6px}
+.fr-flags{display:flex;flex-wrap:wrap;gap:4px}
+.fr-flag{
+  font-size:12px;background:var(--bg3);border:1px solid var(--border);
+  padding:2px 6px;border-radius:2px;cursor:default;
+  font-family:var(--font-mono);font-size:9px;display:flex;align-items:center;gap:3px;color:var(--ink2);
+}
+.fr-count{color:var(--accent);font-size:8px}
+
+/* Post actions */
+.post-actions{
+  padding:8px 12px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.action-btn{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border);
+  padding:6px 12px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.action-btn:hover{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.05)}
+.action-btn.liked{color:var(--gold);border-color:rgba(255,200,64,0.3);background:rgba(255,200,64,0.05)}
+.action-btn .icon{font-size:13px}
+.action-count{color:var(--accent);font-size:12px;font-weight:700}
+.btn-send-flag{
+  margin-left:auto;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:1px;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:6px 14px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+}
+.btn-send-flag:hover{background:#33eeff;box-shadow:0 0 12px rgba(0,229,255,0.4)}
+
+/* Empty feed state */
+.feed-empty{
+  text-align:center;padding:80px 20px;
+  font-family:var(--font-mono);color:var(--muted);font-size:11px;letter-spacing:2px;
+}
+.feed-empty-icon{font-size:48px;margin-bottom:16px;opacity:0.3}
+.feed-loading{
+  text-align:center;padding:60px 20px;
+  font-family:var(--font-mono);color:var(--accent);font-size:10px;letter-spacing:3px;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px;align-self:start}
+.widget{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:16px;position:relative;
+}
+.widget::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--green),var(--purple));opacity:0.5;
+}
+.widget-title{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:2px;
+  color:var(--muted);margin-bottom:14px;text-transform:uppercase;
+}
+
+/* GP widget */
+.gp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.gp-label{font-family:var(--font-mono);font-size:10px;color:var(--ink2)}
+.gp-num{font-family:var(--font-head);font-size:20px;color:var(--gold)}
+.gp-bar-wrap{background:var(--bg3);border:1px solid var(--border);height:6px;border-radius:0;overflow:hidden;position:relative}
+.gp-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--gold),#ffaa00);
+  transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 8px rgba(255,200,64,0.6);
+}
+.gp-sub{font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:6px;letter-spacing:1px}
+
+/* Active countries */
+.active-country{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);cursor:default}
+.active-country:last-child{border-bottom:none}
+.ac-flag{font-size:16px}
+.ac-name{font-family:var(--font-mono);font-size:9px;color:var(--ink2);flex:1;letter-spacing:0.5px}
+.ac-count{font-family:var(--font-mono);font-size:9px;color:var(--accent)}
+
+/* ── RANKING PAGE ── */
+.ranking-layout{max-width:800px;margin:0 auto;padding:32px 28px 60px}
+.page-title{
+  font-family:var(--font-head);font-size:22px;color:var(--ink);letter-spacing:3px;
+  margin-bottom:8px;
+}
+.page-sub{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:28px}
+.rank-tabs{display:flex;gap:4px;margin-bottom:24px}
+.rank-tab{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border);
+  padding:8px 16px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;text-transform:uppercase;
+}
+.rank-tab.active,.rank-tab:hover{color:var(--accent);border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.06)}
+.rank-item{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:14px 18px;margin-bottom:8px;
+  display:flex;align-items:center;gap:16px;transition:all 0.2s;cursor:pointer;
+}
+.rank-item:hover{border-color:rgba(0,229,255,0.2);background:var(--bg3)}
+.rank-item.gold{border-color:rgba(255,200,64,0.4);box-shadow:0 0 16px rgba(255,200,64,0.1)}
+.rank-num{
+  font-family:var(--font-head);font-size:22px;color:var(--muted);
+  width:36px;text-align:center;letter-spacing:0;
+}
+.rank-item.gold .rank-num{color:var(--gold)}
+.rank-thumb{
+  width:56px;height:40px;background:var(--bg3);border:1px solid var(--border);
+  object-fit:cover;flex-shrink:0;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+}
+.rank-thumb img{width:100%;height:100%;object-fit:cover}
+.rank-info{flex:1}
+.rank-name{font-family:var(--font-head);font-size:13px;color:var(--ink);letter-spacing:1px;margin-bottom:3px}
+.rank-user{font-family:var(--font-mono);font-size:11px;color:var(--accent)}
+.rank-right{text-align:right}
+.rank-gp{font-family:var(--font-head);font-size:22px;color:var(--accent)}
+.rank-gp-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px}
+
+/* ── PROFILE PAGE ── */
+.profile-hero{
+  background:var(--bg2);border-bottom:1px solid var(--border2);
+  padding:36px 28px 0;position:relative;
+}
+.profile-hero::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.3;
+}
+.profile-top{display:flex;align-items:flex-start;gap:20px;max-width:900px;margin:0 auto}
+.profile-avatar-lg{
+  width:80px;height:80px;border-radius:50%;
+  border:2px solid var(--accent);background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  flex-shrink:0;overflow:hidden;box-shadow:0 0 24px rgba(0,229,255,0.2);
+}
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover}
+.profile-info{flex:1}
+.profile-name{font-family:var(--font-head);font-size:18px;color:var(--ink);letter-spacing:2px;margin-bottom:4px}
+.profile-handle{font-family:var(--font-mono);font-size:10px;color:var(--accent);margin-bottom:6px}
+.profile-bio{font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:12px}
+.profile-stat-row{display:flex;gap:0;margin-top:4px}
+.profile-stat-row > div{
+  padding:8px 20px;border-right:1px solid var(--border);text-align:center;
+}
+.profile-stat-row > div:first-child{padding-left:0}
+.pstat-num{font-family:var(--font-head);font-size:18px;color:var(--accent)}
+.pstat-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+.profile-tabs{
+  display:flex;gap:0;max-width:900px;margin:20px auto 0;
+  border-bottom:1px solid var(--border);
+}
+.ptab{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--ink2);padding:12px 24px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;
+}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ptab:hover{color:var(--accent)}
+.profile-content{max-width:900px;margin:0 auto;padding:24px 28px 60px}
+.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.work-thumb{
+  aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);
+  cursor:pointer;overflow:hidden;position:relative;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
+  transition:all 0.2s;
+}
+.work-thumb:hover{border-color:rgba(0,229,255,0.3);transform:scale(1.02)}
+.work-thumb img{width:100%;height:100%;object-fit:cover}
+.work-thumb-empty{
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;opacity:0.2;
+}
+.work-thumb-overlay{
+  position:absolute;inset:0;background:rgba(4,6,10,0.7);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  opacity:0;transition:opacity 0.2s;
+  font-family:var(--font-mono);font-size:9px;color:var(--accent);
+}
+.work-thumb:hover .work-thumb-overlay{opacity:1}
+
+/* Flag collection */
+.flags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.flag-cell{
+  aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  cursor:default;transition:all 0.2s;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%);
+}
+.flag-cell.collected{border-color:rgba(0,229,255,0.2);background:rgba(0,229,255,0.04)}
+.flag-cell.collected:hover{background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,0.4)}
+.flag-cell .fc-flag{font-size:20px}
+.flag-cell .fc-count{font-family:var(--font-mono);font-size:7px;color:var(--accent)}
+.flag-cell.locked{opacity:0.2;filter:grayscale(1)}
+
+/* Achievements */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.ach-card{
+  background:var(--bg3);border:1px solid var(--border);
+  clip-path:var(--clip-md);overflow:hidden;position:relative;
+}
+.ach-mosaic{
+  height:70px;overflow:hidden;position:relative;
+  display:flex;flex-wrap:wrap;
+}
+.ach-mosaic-flag{font-size:22px;line-height:1.2;filter:brightness(0.6)}
+.ach-mosaic-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,var(--bg3) 100%);
+}
+.ach-num{
+  position:absolute;bottom:4px;right:8px;
+  font-family:var(--font-head);font-size:28px;color:var(--accent);opacity:0.9;
+}
+.ach-info{padding:10px 12px}
+.ach-name{font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;color:var(--ink2);margin-bottom:2px}
+.ach-desc{font-size:10px;color:var(--muted)}
+.ach-card.locked{opacity:0.4;filter:grayscale(0.6)}
+.ach-card.unlocked .ach-name{color:var(--green)}
+
+/* ── ABOUT PAGE ── */
+.about-wrap{max-width:720px;margin:0 auto;padding:60px 28px 80px}
+.about-title{font-family:var(--font-head);font-size:clamp(28px,5vw,44px);color:var(--ink);letter-spacing:2px;margin-bottom:8px}
+.about-accent{color:var(--accent)}
+.about-sub{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:3px;margin-bottom:40px}
+.about-section{margin-bottom:40px}
+.about-section-title{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--accent);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.about-section-title::before{content:'';display:block;width:24px;height:1px;background:var(--accent)}
+.about-body{font-size:13px;color:var(--ink2);line-height:1.8}
+.about-values{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.av{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:16px;
+}
+.av-icon{font-size:24px;margin-bottom:8px}
+.av-title{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;color:var(--ink);margin-bottom:4px}
+.av-desc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ── MODALS ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  clip-path:var(--clip-lg);
+  width:100%;max-width:540px;max-height:90vh;overflow-y:auto;
+  position:relative;
+}
+.modal-header{
+  padding:20px 24px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--bg2);z-index:10;
+}
+.modal-header::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--accent),var(--green));opacity:0.4;
+}
+.modal-title{font-family:var(--font-head);font-size:14px;color:var(--ink);letter-spacing:2px}
+.modal-close{
+  background:transparent;border:none;color:var(--muted);cursor:pointer;
+  font-size:18px;padding:4px 8px;transition:color 0.2s;
+}
+.modal-close:hover{color:var(--accent)}
+.modal-body{padding:20px 24px 24px}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:18px}
+.form-label{
+  display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--muted);margin-bottom:6px;text-transform:uppercase;
+}
+.form-input,.form-textarea,.form-select{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--ink);font-family:var(--font-body);font-size:13px;
+  padding:10px 12px;outline:none;transition:border-color 0.2s;
+  clip-path:var(--clip-sm);
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:rgba(0,229,255,0.5);box-shadow:0 0 0 2px rgba(0,229,255,0.1)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-select{cursor:pointer;appearance:none}
+.form-hint{font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:4px;letter-spacing:0.5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-error{font-family:var(--font-mono);font-size:9px;color:var(--warm);margin-top:4px}
+
+/* Image upload zone */
+.upload-zone{
+  border:2px dashed var(--border2);background:var(--bg3);
+  padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;
+  clip-path:var(--clip-md);
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(0,229,255,0.04)}
+.upload-zone-icon{font-size:32px;margin-bottom:8px;opacity:0.5}
+.upload-zone-text{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px}
+.upload-preview{position:relative;width:100%;padding-top:40%;overflow:hidden}
+.upload-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.upload-preview-remove{
+  position:absolute;top:8px;right:8px;
+  background:rgba(255,77,26,0.8);border:none;color:white;
+  padding:4px 8px;cursor:pointer;font-size:10px;
+  clip-path:var(--clip-sm);
+}
+
+/* Submit buttons */
+.btn-submit{
+  width:100%;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:12px;clip-path:var(--clip-sm);transition:all 0.2s;font-weight:700;
+  text-transform:uppercase;
+}
+.btn-submit:hover{background:#33eeff;box-shadow:0 0 20px rgba(0,229,255,0.4)}
+.btn-submit:disabled{opacity:0.4;cursor:not-allowed}
+.btn-outline{
+  width:100%;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);cursor:pointer;
+  padding:12px;clip-path:var(--clip-sm);transition:all 0.2s;margin-top:8px;
+}
+.btn-outline:hover{color:var(--accent);border-color:rgba(0,229,255,0.4)}
+
+/* Auth divider */
+.auth-divider{
+  display:flex;align-items:center;gap:12px;margin:16px 0;
+  font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:2px;
+}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Social auth buttons */
+.btn-social{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;
+  color:var(--ink);background:var(--bg3);border:1px solid var(--border2);cursor:pointer;
+  padding:11px;clip-path:var(--clip-sm);transition:all 0.2s;margin-bottom:8px;
+}
+.btn-social:hover{border-color:rgba(0,229,255,0.3);background:var(--bg4)}
+.btn-social-icon{font-size:16px}
+
+/* Auth tabs */
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.auth-tab{
+  flex:1;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--ink2);padding:10px;cursor:pointer;text-align:center;
+  border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;
+}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── TAGS INPUT ── */
+.tags-wrap{
+  display:flex;flex-wrap:wrap;gap:4px;align-items:center;
+  background:var(--bg3);border:1px solid var(--border2);
+  padding:6px;clip-path:var(--clip-sm);min-height:40px;
+}
+.tag-chip{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);
+  padding:2px 6px;font-family:var(--font-mono);font-size:9px;color:var(--accent);
+  clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,0 100%);
+}
+.tag-chip-remove{cursor:pointer;color:var(--muted);font-size:10px;padding:0 2px}
+.tag-chip-remove:hover{color:var(--warm)}
+.tags-input{
+  background:transparent;border:none;outline:none;
+  color:var(--ink);font-family:var(--font-body);font-size:13px;
+  flex:1;min-width:80px;padding:2px 4px;
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--bg3);border:1px solid var(--border2);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--accent);
+  padding:10px 20px;clip-path:var(--clip-md);z-index:9999;
+  opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--bg2) 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);padding:56px 28px 48px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(0,229,255,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:4px;margin-bottom:12px}
+.hero-title{
+  font-family:var(--font-head);font-size:clamp(36px,6vw,64px);
+  color:var(--ink);letter-spacing:2px;line-height:1.1;margin-bottom:8px;
+}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:3px;margin-bottom:32px}
+.hero-flags{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:32px}
+.hero-flag{
+  width:40px;height:40px;border-radius:50%;background:var(--bg3);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-size:20px;transition:transform 0.2s;
+}
+.hero-flag:hover{transform:scale(1.2)}
+.hero-stats{display:flex;justify-content:center;gap:0;max-width:400px;margin:0 auto;border:1px solid var(--border);clip-path:var(--clip-md)}
+.hero-stats > div{flex:1;padding:16px 0;text-align:center;border-right:1px solid var(--border)}
+.hero-stats > div:last-child{border-right:none}
+.hstat-num{font-family:var(--font-head);font-size:24px;color:var(--accent)}
+.hstat-label{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none}
+/* ══════════════════════════════════════════════════
+   PLAMOX PROFILE v3 — "一瞬でスゴさが伝わる" UI
+══════════════════════════════════════════════════ */
+
+/* ① HEADER */
+.prof-wrap{max-width:680px;margin:0 auto}
+.prof-header{
+  position:relative;background:var(--bg2);
+  border-bottom:1px solid var(--border2);
+  overflow:hidden;
+}
+.prof-cover{
+  height:120px;background:linear-gradient(135deg,#04060a 0%,#0a1428 50%,#04060a 100%);
+  position:relative;overflow:hidden;
+}
+.prof-cover::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 100% 100% at 20% 50%,rgba(0,229,255,0.15) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 80% at 80% 50%,rgba(57,255,144,0.08) 0%,transparent 60%);
+}
+.prof-cover-grid{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(0,229,255,0.04) 20px),
+             repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(0,229,255,0.03) 20px);
+}
+.prof-header-body{
+  padding:0 20px 20px;position:relative;
+}
+.prof-avatar-row{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-top:-44px;margin-bottom:12px;
+}
+.prof-avatar-outer{
+  width:88px;height:88px;border-radius:50%;
+  border:3px solid var(--bg2);background:var(--bg3);
+  box-shadow:0 0 0 2px var(--accent),0 0 20px rgba(0,229,255,0.3);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:40px;flex-shrink:0;
+}
+.prof-avatar-outer img{width:100%;height:100%;object-fit:cover}
+.prof-header-btns{
+  display:flex;gap:8px;padding-bottom:4px;
+}
+.btn-follow{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;font-weight:700;
+  color:var(--bg);background:var(--accent);border:none;cursor:pointer;
+  padding:8px 20px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-follow:hover{background:#33eeff;box-shadow:0 0 14px rgba(0,229,255,0.5)}
+.btn-msg{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);cursor:pointer;
+  padding:8px 16px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-msg:hover{color:var(--accent);border-color:rgba(0,229,255,0.4)}
+.btn-edit-sm{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--ink2);background:transparent;border:1px solid var(--border2);cursor:pointer;
+  padding:8px 14px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-edit-sm:hover{color:var(--accent);border-color:rgba(0,229,255,0.4)}
+.prof-name-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:2px;flex-wrap:wrap;
+}
+.prof-name{
+  font-family:var(--font-cond);font-size:24px;font-weight:900;
+  color:var(--ink);letter-spacing:0.5px;
+}
+.prof-country-flag{font-size:22px;line-height:1}
+.prof-handle{
+  font-family:var(--font-mono);font-size:11px;color:var(--accent);
+  margin-bottom:6px;
+}
+.prof-tagline{
+  font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:10px;
+}
+.prof-style-chips{display:flex;flex-wrap:wrap;gap:5px}
+.prof-style-chip{
+  font-family:var(--font-mono);font-size:9px;color:var(--green);
+  background:rgba(57,255,144,0.08);border:1px solid rgba(57,255,144,0.2);
+  padding:3px 8px;border-radius:2px;
+}
+
+/* ② STATUS BAR — 戦闘力 */
+.prof-status{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:var(--bg2);
+}
+.prof-stat{
+  padding:16px 12px;text-align:center;border-right:1px solid var(--border);
+  cursor:default;transition:background 0.2s;
+}
+.prof-stat:last-child{border-right:none}
+.prof-stat:hover{background:rgba(0,229,255,0.03)}
+.prof-stat-num{
+  font-family:var(--font-cond);font-size:26px;font-weight:900;
+  color:var(--ink);line-height:1;margin-bottom:3px;
+}
+.prof-stat-num.accent{color:var(--accent)}
+.prof-stat-num.gold{color:var(--gold)}
+.prof-stat-label{
+  font-family:var(--font-mono);font-size:9px;color:var(--muted);
+  letter-spacing:1px;text-transform:uppercase;
+}
+.prof-rank-bar{
+  background:var(--bg3);border-bottom:1px solid var(--border);
+  padding:8px 20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;
+}
+.prof-rank-item{
+  font-family:var(--font-mono);font-size:10px;color:var(--ink2);
+  display:flex;align-items:center;gap:6px;
+}
+.prof-rank-num{
+  color:var(--gold);font-weight:700;font-size:12px;
+}
+
+/* ③ GLOBAL EVALUATION */
+.prof-block{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:20px;
+}
+.prof-block-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.prof-block-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-cond);font-size:14px;font-weight:900;
+  color:var(--ink);letter-spacing:1px;text-transform:uppercase;
+}
+.prof-block-title-icon{font-size:16px}
+.prof-block-more{
+  font-family:var(--font-mono);font-size:9px;color:var(--accent);
+  cursor:pointer;letter-spacing:1px;
+}
+.prof-block-more:hover{text-decoration:underline}
+.prof-global-hero{
+  display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  padding:14px 16px;background:var(--bg3);border:1px solid rgba(0,229,255,0.15);
+  clip-path:var(--clip-sm);
+}
+.prof-globe{font-size:32px}
+.prof-liked-count{
+  font-family:var(--font-cond);font-size:28px;font-weight:900;color:var(--accent);
+  line-height:1;
+}
+.prof-liked-label{
+  font-family:var(--font-mono);font-size:9px;color:var(--muted);
+  letter-spacing:1px;margin-top:2px;
+}
+.prof-flags-scroll{
+  display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:none;
+}
+.prof-flags-scroll::-webkit-scrollbar{display:none}
+.prof-flag-btn{
+  flex-shrink:0;font-size:24px;background:var(--bg3);
+  border:1px solid var(--border);padding:6px 10px;border-radius:4px;
+  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;
+}
+.prof-flag-btn:hover{border-color:var(--accent);background:rgba(0,229,255,0.08);transform:scale(1.1)}
+.prof-flag-cnt{
+  font-family:var(--font-mono);font-size:9px;color:var(--ink2);
+}
+.prof-flag-expand{
+  max-height:0;overflow:hidden;transition:max-height 0.3s ease;
+}
+.prof-flag-expand.open{max-height:400px}
+.prof-flag-bar-list{margin-top:12px}
+.prof-flag-bar-row{
+  display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid rgba(22,32,48,0.8);
+}
+.prof-flag-bar-flag{font-size:16px;width:24px;text-align:center}
+.prof-flag-bar-name{
+  font-family:var(--font-mono);font-size:10px;color:var(--ink2);
+  width:90px;flex-shrink:0;
+}
+.prof-flag-bar-track{
+  flex:1;height:5px;background:var(--bg4);border-radius:0;overflow:hidden;
+}
+.prof-flag-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--accent),var(--green));
+  box-shadow:0 0 4px rgba(0,229,255,0.5);transition:width 0.5s ease;
+}
+.prof-flag-bar-num{
+  font-family:var(--font-mono);font-size:10px;color:var(--accent);
+  width:24px;text-align:right;
+}
+
+/* ④ BADGES — 横スクロール */
+.prof-badges-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;
+  scrollbar-width:none;
+}
+.prof-badges-scroll::-webkit-scrollbar{display:none}
+.prof-badge-card{
+  flex-shrink:0;width:120px;
+  background:var(--bg3);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:14px 12px;text-align:center;
+  transition:all 0.2s;cursor:default;
+}
+.prof-badge-card.unlocked{
+  border-color:rgba(255,200,64,0.4);background:rgba(255,200,64,0.05);
+}
+.prof-badge-card.locked{opacity:0.3;filter:grayscale(1)}
+.prof-badge-card:hover{transform:translateY(-2px)}
+.prof-badge-icon{font-size:28px;margin-bottom:6px}
+.prof-badge-name{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:1px;
+  color:var(--muted);text-transform:uppercase;line-height:1.3;
+}
+.prof-badge-card.unlocked .prof-badge-name{color:var(--gold)}
+.prof-badge-req{
+  font-family:var(--font-cond);font-size:18px;font-weight:900;
+  color:var(--border2);margin-top:4px;
+}
+.prof-badge-card.unlocked .prof-badge-req{color:var(--gold)}
+
+/* ⑤ FEATURED BUILD */
+.featured-v3{
+  background:var(--bg3);border:1px solid rgba(255,200,64,0.25);
+  clip-path:var(--clip-md);overflow:hidden;cursor:pointer;
+  transition:all 0.2s;
+}
+.featured-v3:hover{border-color:rgba(255,200,64,0.5);box-shadow:0 0 20px rgba(255,200,64,0.08)}
+.featured-v3-img{
+  width:100%;height:200px;object-fit:cover;display:block;
+  background:var(--bg4);
+}
+.featured-v3-img-placeholder{
+  height:200px;background:var(--bg4);
+  display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.2;
+}
+.featured-v3-body{padding:16px}
+.featured-v3-label{
+  font-family:var(--font-mono);font-size:8px;color:var(--gold);
+  letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:6px;
+}
+.featured-v3-title{
+  font-family:var(--font-cond);font-size:20px;font-weight:900;
+  color:var(--ink);letter-spacing:0.5px;margin-bottom:10px;
+}
+.featured-v3-stats{display:flex;gap:16px;flex-wrap:wrap}
+.featured-v3-stat{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);font-size:11px;color:var(--ink2);
+}
+.featured-v3-stat strong{color:var(--accent);font-size:13px}
+
+/* ⑥ BUILDS GRID */
+.builds-grid-v3{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
+}
+.build-thumb-v3{
+  aspect-ratio:1;background:var(--bg3);overflow:hidden;
+  position:relative;cursor:pointer;
+}
+.build-thumb-v3 img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s}
+.build-thumb-v3:hover img{transform:scale(1.05)}
+.build-thumb-v3-empty{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:20px;opacity:0.15;
+}
+.build-thumb-v3-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(4,6,10,0.8) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.2s;
+  display:flex;align-items:flex-end;padding:6px;
+  font-family:var(--font-mono);font-size:9px;color:var(--accent);gap:6px;
+}
+.build-thumb-v3:hover .build-thumb-v3-overlay{opacity:1}
+
+/* ⑦ COMMUNITY & ⑧ RANKING */
+.prof-two-col{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border)}
+.prof-mini-block{
+  padding:16px 20px;border-right:1px solid var(--border);
+}
+.prof-mini-block:last-child{border-right:none}
+.prof-mini-title{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:2px;
+  color:var(--muted);margin-bottom:10px;text-transform:uppercase;
+}
+.prof-mini-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 0;border-bottom:1px solid rgba(22,32,48,0.6);
+}
+.prof-mini-row:last-child{border-bottom:none}
+.prof-mini-label{font-size:11px;color:var(--ink2)}
+.prof-mini-val{
+  font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--accent);
+}
+.prof-mini-val.gold{color:var(--gold)}
+
+/* SHARE BTN */
+.btn-share{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1px;
+  color:var(--accent);background:rgba(0,229,255,0.08);
+  border:1px solid rgba(0,229,255,0.25);cursor:pointer;
+  padding:6px 12px;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-share:hover{background:rgba(0,229,255,0.15)}
+
+/* Responsive */
+@media(max-width:600px){
+  .prof-cover{height:90px}
+  .prof-avatar-outer{width:72px;height:72px;font-size:32px}
+  .prof-name{font-size:20px}
+  .prof-stat-num{font-size:22px}
+  .prof-two-col{grid-template-columns:1fr}
+  .prof-mini-block{border-right:none;border-bottom:1px solid var(--border)}
+  .builds-grid-v3{grid-template-columns:repeat(3,1fr);gap:2px}
+  .prof-block{padding:16px 14px}
+  .prof-header-body{padding:0 14px 16px}
+}
+
+
+@media(max-width:600px){
+  .prof-hero{padding:24px 14px}
+  .prof-hero-inner{flex-direction:column;align-items:center;text-align:center}
+  .prof-hero-actions{flex-direction:row;justify-content:center}
+  .prof-power-grid{grid-template-columns:repeat(2,1fr)}
+  .prof-community-grid{grid-template-columns:repeat(3,1fr)}
+  .featured-card{flex-direction:column}
+  .featured-img{width:100%;height:160px}
+  .featured-info{padding:16px}
+  .prof-section{padding:20px 14px}
+  .prof-name{font-size:22px}
+}
+
+  .mobile-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;cursor:pointer;background:transparent;border:none;
+    color:var(--muted);font-family:var(--font-mono);font-size:7px;letter-spacing:1px;
+    text-transform:uppercase;padding:8px 0;transition:color 0.2s;
+  }
+  .mobile-nav-item.active{color:var(--accent)}
+  .mobile-nav-item .mn-icon{font-size:17px}
+  nav{padding:0 14px;height:50px}
+  .nav-tagline{display:none}
+  .nav-links{display:none}
+  .page{padding-top:50px;padding-bottom:56px}
+  .feed-layout{grid-template-columns:1fr;padding:12px;gap:0}
+  .sidebar{display:none}
+  .ranking-layout,.about-wrap{padding:20px 14px 80px}
+  .profile-hero{padding:24px 14px 0}
+  .profile-content{padding:16px 14px 80px}
+  .profile-top{flex-direction:column;align-items:center;text-align:center}
+  .hero{padding:40px 14px 36px}
+  .about-values{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .works-grid{grid-template-columns:repeat(3,1fr);gap:3px}
+}
+@media(max-width:900px){
+  .feed-layout{grid-template-columns:1fr;padding:16px 20px 80px}
+  .sidebar{display:none}
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.post{animation:slideUp 0.3s ease both}
+
+/* Delete confirm */
+.btn-danger{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  color:var(--warm);background:transparent;border:1px solid rgba(255,77,26,0.4);
+  padding:6px 12px;cursor:pointer;clip-path:var(--clip-sm);transition:all 0.2s;
+}
+.btn-danger:hover{background:rgba(255,77,26,0.1)}
+
+/* Spinner */
+.spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid var(--border2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ DASHBOARD STATS ══ */
+.dash-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.dash-card{
+  background:var(--bg2);border:1px solid var(--border);
+  clip-path:var(--clip-md);padding:14px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.dash-card:hover{border-color:var(--border2);box-shadow:0 0 16px rgba(0,229,255,0.05)}
+.dash-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.dash-world::before{background:linear-gradient(90deg,var(--accent),var(--green))}
+.dash-eval::before {background:linear-gradient(90deg,var(--purple),var(--accent))}
+.dash-gp::before   {background:linear-gradient(90deg,var(--gold),#ff8c00)}
+.dash-daily::before{background:linear-gradient(90deg,#ff8c00,var(--warm))}
+
+.dash-card-top{
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:8px;
+}
+.dash-icon{font-size:15px}
+.dash-label{
+  font-family:var(--font-mono);font-size:8px;
+  color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;
+}
+.dash-num{
+  font-family:var(--font-cond);font-size:32px;font-weight:900;
+  color:var(--accent);line-height:1;margin-bottom:4px;
+}
+.dash-num-gold{color:var(--gold)}
+.dash-sub{
+  font-family:var(--font-mono);font-size:9px;
+  color:var(--muted);letter-spacing:0.5px;margin-bottom:8px;
+}
+.dash-bar-wrap{
+  height:4px;background:var(--bg3);border-radius:0;overflow:hidden;
+}
+.dash-bar-fill{
+  height:100%;border-radius:0;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.dash-bar-accent{background:linear-gradient(90deg,var(--accent),var(--green));box-shadow:0 0 6px rgba(0,229,255,0.5)}
+.dash-bar-gold  {background:linear-gradient(90deg,var(--gold),#ff8c00);box-shadow:0 0 6px rgba(255,200,64,0.5)}
+
+.dash-pips{
+  display:flex;gap:5px;margin-bottom:6px;
+}
+.dash-pip{
+  flex:1;height:8px;border-radius:1px;
+  background:rgba(255,200,64,0.15);
+  border:1px solid rgba(255,200,64,0.2);
+  transition:all 0.3s;
+}
+.dash-pip.active{
+  background:var(--gold);
+  border-color:var(--gold);
+  box-shadow:0 0 6px rgba(255,200,64,0.6);
+}
+
+.dash-flag-mini{
+  display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;
+}
+.dash-flag-mini span{font-size:14px;line-height:1}
+
+@media(max-width:900px){
+  .dash-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .dash-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .dash-card{padding:12px}
+  .dash-num{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav id="mainNav">
+  <div style="display:flex;align-items:center;">
+    <div class="nav-logo" onclick="showPage('home')">PLAMO<span>X</span></div>
+    <div class="nav-tagline">Build · Share · Connect</div>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active" id="nl-home"    onclick="showPage('home')"    data-i18n="nav_feed">フィード</div>
+    <div class="nav-link"        id="nl-ranking" onclick="showPage('ranking')" data-i18n="nav_ranking">ランキング</div>
+    <div class="nav-link"        id="nl-profile" onclick="showPage('profile')" data-i18n="nav_profile">プロフィール</div>
+    <div class="nav-link"        id="nl-about"   onclick="showPage('about')"   data-i18n="nav_about">について</div>
+  </div>
+  <div class="nav-right">
+    <!-- Lang -->
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn-main" onclick="toggleLang()">
+        <span id="langFlag">🇯🇵</span>
+        <span id="langCode">JA</span>
+        <span class="lang-arrow">▾</span>
+      </button>
+      <div class="lang-dropdown" id="langDropdown"></div>
+    </div>
+    <!-- GP (shown when logged in) -->
+    <div class="nav-gp" id="navGP" style="display:none">
+      <span>⚡</span>
+      <span class="nav-gp-num" id="navGPNum">5</span>
+      <span style="font-size:8px;color:var(--muted)">GP</span>
+    </div>
+    <!-- Auth area -->
+    <div id="navAuthArea">
+      <button class="btn-auth" onclick="openModal('authModal')">LOGIN / SIGN UP</button>
+    </div>
+    <!-- Post button (shown when logged in) -->
+    <button class="btn-post" id="btnPost" style="display:none" onclick="openModal('postModal')">＋ POST</button>
+  </div>
+</nav>
+
+<!-- ══════════════════ PAGES ══════════════════ -->
+
+<!-- HOME / FEED -->
+<div class="page active" id="page-home">
+  <!-- Hero (shown when not logged in) -->
+  <div class="hero" id="heroSection">
+    <div class="hero-eyebrow">GLOBAL MODEL COMMUNITY</div>
+    <div class="hero-title">WHERE YOUR BUILD<br>MEETS THE <span>WORLD</span></div>
+    <div class="hero-sub">Build · Share · Connect</div>
+    <div class="hero-flags" id="heroFlags"></div>
+    <div class="hero-stats">
+      <div><div class="hstat-num" id="statPosts">—</div><div class="hstat-label">WORKS</div></div>
+      <div><div class="hstat-num" id="statUsers">—</div><div class="hstat-label">BUILDERS</div></div>
+      <div><div class="hstat-num" id="statCountries">—</div><div class="hstat-label">COUNTRIES</div></div>
+    </div>
+  </div>
+
+  <div class="feed-layout">
+    <!-- ══ DASHBOARD STATS（常時表示） ══ -->
+    <div id="dashStats" style="grid-column:1/-1;margin-bottom:8px">
+      <div class="dash-grid">
+
+        <!-- 世界の参加人口 -->
+        <div class="dash-card dash-world">
+          <div class="dash-card-top">
+            <span class="dash-icon">🌍</span>
+            <span class="dash-label">WORLD BUILDERS</span>
+          </div>
+          <div class="dash-num" id="dashBuilders">—</div>
+          <div class="dash-sub" id="dashCountriesActive">— countries active</div>
+          <div class="dash-bar-wrap">
+            <div class="dash-bar-fill dash-bar-accent" id="dashBuildersBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- 自分が獲得した評価数（ログイン時のみ数値入る） -->
+        <div class="dash-card dash-eval">
+          <div class="dash-card-top">
+            <span class="dash-icon">🏴</span>
+            <span class="dash-label">MY FLAGS RECEIVED</span>
+          </div>
+          <div class="dash-num" id="dashMyFlags">—</div>
+          <div class="dash-sub" id="dashMyFlagSub">from — countries</div>
+          <div class="dash-flag-mini" id="dashFlagMini"></div>
+        </div>
+
+        <!-- 獲得GPの数 -->
+        <div class="dash-card dash-gp">
+          <div class="dash-card-top">
+            <span class="dash-icon">⚡</span>
+            <span class="dash-label">MY TOTAL GP</span>
+          </div>
+          <div class="dash-num dash-num-gold" id="dashMyGP">—</div>
+          <div class="dash-sub" id="dashGPRank">Global Rank —</div>
+          <div class="dash-bar-wrap">
+            <div class="dash-bar-fill dash-bar-gold" id="dashGPBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- 本日の評価可能GP数 -->
+        <div class="dash-card dash-daily">
+          <div class="dash-card-top">
+            <span class="dash-icon">🎯</span>
+            <span class="dash-label">TODAY'S GP</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <div class="dash-num dash-num-gold" id="dashGPRemain">5</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">/5</div>
+          </div>
+          <div class="dash-pips" id="dashPips">
+            <div class="dash-pip active" id="dp1"></div>
+            <div class="dash-pip active" id="dp2"></div>
+            <div class="dash-pip active" id="dp3"></div>
+            <div class="dash-pip active" id="dp4"></div>
+            <div class="dash-pip active" id="dp5"></div>
+          </div>
+          <div class="dash-sub" id="dashGPResetTime">Resets at midnight</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GP Banner (shown when logged in, above feed on mobile too) -->
+    <div id="gpBanner" style="display:none;grid-column:1/-1;margin-bottom:4px">
+      <div style="
+        background:var(--bg2);border:1px solid rgba(255,200,64,0.25);
+        clip-path:var(--clip-md);padding:14px 20px;
+        display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+        position:relative;overflow:hidden;
+      ">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),#ff8c00);opacity:0.7"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:28px">⚡</span>
+          <div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px" data-i18n="daily_gp">デイリーGP</div>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <span style="font-family:var(--font-head);font-size:36px;color:var(--gold);line-height:1" id="gpBannerNum">5</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)" data-i18n="gp_today">/ 5 GP 今日</span>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:160px">
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px" data-i18n="remaining">残り</div>
+          <div style="background:var(--bg3);border:1px solid var(--border);height:10px;border-radius:0;overflow:hidden;position:relative">
+            <div id="gpBannerBar" style="height:100%;background:linear-gradient(90deg,var(--gold),#ff8c00);transition:width 0.5s ease;box-shadow:0 0 10px rgba(255,200,64,0.6);width:100%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">0</span>
+            <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">5</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          ${[1,2,3,4,5].map(i=>`<div class="gp-pip" id="gpPip${i}" style="
+            width:18px;height:18px;border-radius:50%;
+            border:2px solid rgba(255,200,64,0.4);
+            background:rgba(255,200,64,0.15);
+            transition:all 0.3s;
+          "></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="feed-main">
+      <div class="feed-header">
+        <span class="feed-title" id="feedTitle">LATEST BUILDS</span>
+        <div class="feed-sort">
+          <button class="sort-btn active" onclick="setSort('new',this)">NEW</button>
+          <button class="sort-btn" onclick="setSort('top',this)">TOP</button>
+        </div>
+      </div>
+      <div id="feedContainer">
+        <div class="feed-loading">LOADING BUILDS...</div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <!-- GP widget -->
+      <div class="widget" id="gpWidget" style="display:none">
+        <div class="widget-title">⚡ DAILY G-POINTS</div>
+        <div class="gp-row">
+          <span class="gp-label">REMAINING</span>
+          <span class="gp-num" id="gpNum">5</span>
+        </div>
+        <div class="gp-bar-wrap"><div class="gp-bar-fill" id="gpBar" style="width:100%"></div></div>
+        <div class="gp-sub" id="gpSub">5 / 5 GP TODAY</div>
+      </div>
+      <!-- Active countries -->
+      <div class="widget">
+        <div class="widget-title">🌍 ACTIVE COUNTRIES</div>
+        <div id="activeCountries"></div>
+      </div>
+      <!-- Global Supporters -->
+      <div class="widget">
+        <div class="widget-title">🏆 TOP BUILDERS</div>
+        <div id="topBuilders"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RANKING -->
+<div class="page" id="page-ranking">
+  <div class="ranking-layout">
+    <div class="page-title">GLOBAL RANKING</div>
+    <div class="page-sub">TOP BUILDERS FROM AROUND THE WORLD</div>
+    <div class="rank-tabs">
+      <button class="rank-tab active" onclick="setRankTab('works',this)">🏆 WORKS</button>
+      <button class="rank-tab" onclick="setRankTab('countries',this)">🌍 COUNTRIES</button>
+      <button class="rank-tab" onclick="setRankTab('flags',this)">🏴 MOST FLAGS</button>
+    </div>
+    <div id="rankingContainer"><div class="feed-loading">LOADING...</div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="page-profile">
+  <!-- Not logged in -->
+  <div id="profileNotLoggedIn" style="text-align:center;padding:100px 20px">
+    <div style="font-size:48px;margin-bottom:16px;opacity:0.3">👤</div>
+    <div style="font-family:var(--font-mono);font-size:13px;color:var(--muted);letter-spacing:2px;margin-bottom:20px">LOGIN TO VIEW YOUR PROFILE</div>
+    <button class="btn-auth" onclick="openModal('authModal')">LOGIN / SIGN UP</button>
+  </div>
+
+  <!-- Logged in -->
+  <div id="profileLoggedIn" style="display:none">
+    <div class="prof-wrap" style="padding-bottom:80px">
+
+      <!-- ① HEADER -->
+      <div class="prof-header">
+        <div class="prof-cover">
+          <div class="prof-cover-grid"></div>
+        </div>
+        <div class="prof-header-body">
+          <div class="prof-avatar-row">
+            <div class="prof-avatar-outer" id="profileAvatar">👤</div>
+            <div class="prof-header-btns">
+              <button class="btn-share" onclick="openShareModal()">📤 SHARE</button>
+              <button class="btn-edit-sm" onclick="openModal('editProfileModal')">✏ EDIT</button>
+            </div>
+          </div>
+          <div class="prof-name-row">
+            <div class="prof-name" id="profileName">—</div>
+            <div class="prof-country-flag" id="profCountryFlag">🇯🇵</div>
+          </div>
+          <div class="prof-handle" id="profileHandle">@—</div>
+          <div class="prof-tagline" id="profileBio"></div>
+          <div class="prof-style-chips" id="profStyles"></div>
+        </div>
+      </div>
+
+      <!-- ② STATUS BAR -->
+      <div class="prof-status">
+        <div class="prof-stat">
+          <div class="prof-stat-num accent" id="pstatGP">0</div>
+          <div class="prof-stat-label">⚡ Gpoints</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-num" id="pstatWorks">0</div>
+          <div class="prof-stat-label">📦 Builds</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-num gold" id="pstatFollowers">—</div>
+          <div class="prof-stat-label">👥 Followers</div>
+        </div>
+      </div>
+      <div class="prof-rank-bar">
+        <div class="prof-rank-item">🌐 Global Rank <span class="prof-rank-num" id="profGlobalRank">#—</span></div>
+        <div class="prof-rank-item">🏴 Country Rank <span class="prof-rank-num" id="profCountryRank">#—</span></div>
+      </div>
+
+      <!-- ③ GLOBAL EVALUATION -->
+      <div class="prof-block">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">🌍</span> GLOBAL EVALUATION
+          </div>
+          <span class="prof-block-more" onclick="toggleFlagDetail()" id="flagDetailToggle">▼ DETAILS</span>
+        </div>
+        <div class="prof-global-hero">
+          <div class="prof-globe">🌍</div>
+          <div>
+            <div class="prof-liked-count" id="profLikedIn">0</div>
+            <div class="prof-liked-label">COUNTRIES REACHED</div>
+          </div>
+        </div>
+        <div class="prof-flags-scroll" id="profFlagStrip"></div>
+        <div class="prof-flag-expand" id="flagDetailPanel">
+          <div class="prof-flag-bar-list" id="flagBarList"></div>
+        </div>
+      </div>
+
+      <!-- ④ BADGES -->
+      <div class="prof-block">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">🏆</span> ACHIEVEMENTS
+          </div>
+        </div>
+        <div class="prof-badges-scroll" id="profBadges"></div>
+      </div>
+
+      <!-- ⑤ FEATURED BUILD -->
+      <div class="prof-block" id="profFeaturedSection">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">🔥</span> FEATURED BUILD
+          </div>
+        </div>
+        <div id="profFeatured"></div>
+      </div>
+
+      <!-- ⑥ BUILDS GRID -->
+      <div class="prof-block">
+        <div class="prof-block-head">
+          <div class="prof-block-title">
+            <span class="prof-block-title-icon">📸</span> BUILDS
+            <span id="pstatBuildsCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0"></span>
+          </div>
+        </div>
+        <div class="builds-grid-v3" id="ptab-builds"></div>
+      </div>
+
+      <!-- ⑦ COMMUNITY + ⑧ RANKING -->
+      <div class="prof-two-col">
+        <div class="prof-mini-block">
+          <div class="prof-mini-title">🤝 GLOBAL SUPPORT</div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">GP Given</span>
+            <span class="prof-mini-val" id="profGivenGP">0</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">Flags Sent</span>
+            <span class="prof-mini-val" id="profFlagsGiven">0</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">Countries</span>
+            <span class="prof-mini-val" id="profCountriesSupported">0</span>
+          </div>
+        </div>
+        <div class="prof-mini-block">
+          <div class="prof-mini-title">📊 RANKING</div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">🌐 Global</span>
+            <span class="prof-mini-val gold" id="profGlobalRank2">#—</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">🏴 Country</span>
+            <span class="prof-mini-val gold" id="profCountryRank2">#—</span>
+          </div>
+          <div class="prof-mini-row">
+            <span class="prof-mini-label">🌍 Countries</span>
+            <span class="prof-mini-val" id="pstatCountries">0</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="about-wrap">
+    <div class="about-title">WHERE YOUR BUILD<br>MEETS THE <span class="about-accent">WORLD</span></div>
+    <div class="about-sub">PLAMOX — GLOBAL MODEL COMMUNITY</div>
+    <div class="about-section">
+      <div class="about-section-title">CONCEPT</div>
+      <div class="about-body">PLAMOXは、世界中のモデラーが作品を通じて繋がるためのSNSです。売買や商業取引はありません。あるのは、純粋なリスペクトと国境を越えた評価だけ。</div>
+    </div>
+    <div class="about-section">
+      <div class="about-section-title">HOW IT WORKS</div>
+      <div class="about-body">毎日5GPが配布されます。気に入った作品にGPを送ることで、その作者を応援できます。また、自分の国の国旗スタンプを投稿に送ることで「あなたの作品は私の国にも届いている」というメッセージを伝えることができます。</div>
+    </div>
+    <div class="about-values">
+      <div class="av"><div class="av-icon">⚡</div><div class="av-title">G-POINTS</div><div class="av-desc">毎日5GP。ポイントで作品を応援する。</div></div>
+      <div class="av"><div class="av-icon">🏴</div><div class="av-title">FLAG STAMPS</div><div class="av-desc">国旗で国境を越えたリスペクトを送る。</div></div>
+      <div class="av"><div class="av-icon">🌍</div><div class="av-title">GLOBAL REACH</div><div class="av-desc">何カ国に届いたか可視化される達成感。</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">ACCOUNT</span>
+      <button class="modal-close" onclick="closeModal('authModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="setAuthTab('login')">LOGIN</div>
+        <div class="auth-tab" onclick="setAuthTab('signup')">SIGN UP</div>
+      </div>
+      <!-- Social -->
+      <button class="btn-social" onclick="authWithGoogle()">
+        <span class="btn-social-icon">🔵</span> Continue with Google
+      </button>
+      <button class="btn-social" onclick="authWithTwitter()">
+        <span class="btn-social-icon">𝕏</span> Continue with X (Twitter)
+      </button>
+      <div class="auth-divider">OR</div>
+      <!-- Email form -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+          <div class="form-error" id="loginError"></div>
+        </div>
+        <button class="btn-submit" onclick="emailLogin()">LOGIN</button>
+      </div>
+      <div id="signupForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label">DISPLAY NAME</label>
+          <input class="form-input" type="text" id="signupName" placeholder="YourBuildName">
+        </div>
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input class="form-input" type="email" id="signupEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input class="form-input" type="password" id="signupPassword" placeholder="8+ characters">
+          <div class="form-error" id="signupError"></div>
+        </div>
+        <button class="btn-submit" onclick="emailSignup()">CREATE ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <span class="modal-title">NEW BUILD</span>
+      <button class="modal-close" onclick="closeModal('postModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Image upload -->
+      <div class="form-group">
+        <label class="form-label">PHOTO *</label>
+        <div id="uploadZone" class="upload-zone" onclick="document.getElementById('imgFileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="handleImgDrop(event)">
+          <div class="upload-zone-icon">📷</div>
+          <div class="upload-zone-text">CLICK OR DRAG & DROP</div>
+          <div class="upload-zone-text" style="color:var(--muted);font-size:8px;margin-top:4px">JPG / PNG / WEBP · MAX 5MB</div>
+        </div>
+        <div id="uploadPreview" style="display:none" class="upload-preview">
+          <img id="previewImg" src="">
+          <button class="upload-preview-remove" onclick="removeImg()">✕ REMOVE</button>
+        </div>
+        <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="handleImgSelect(event)">
+      </div>
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label">WORK TITLE *</label>
+        <input class="form-input" type="text" id="postTitle" placeholder="e.g. RX-78 DEEP CHROME CUSTOM" maxlength="80">
+      </div>
+      <div class="form-row">
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label">CATEGORY *</label>
+          <select class="form-select" id="postCategory">
+            <option value="">-- SELECT --</option>
+            <option value="gunpla">Gunpla</option>
+            <option value="figure">Figure</option>
+            <option value="vehicle">Vehicle</option>
+            <option value="aircraft">Aircraft</option>
+            <option value="ship">Ship / Naval</option>
+            <option value="diorama">Diorama</option>
+            <option value="sci-fi">Sci-Fi</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <!-- Scale -->
+        <div class="form-group">
+          <label class="form-label">SCALE</label>
+          <select class="form-select" id="postScale">
+            <option value="">-- NONE --</option>
+            <option value="1/144">1/144</option>
+            <option value="1/100">1/100</option>
+            <option value="HG">HG</option>
+            <option value="MG">MG</option>
+            <option value="PG">PG</option>
+            <option value="RG">RG</option>
+            <option value="1/35">1/35</option>
+            <option value="1/48">1/48</option>
+            <option value="1/72">1/72</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">DESCRIPTION</label>
+        <textarea class="form-textarea" id="postDesc" placeholder="制作の背景や工程など..." maxlength="500" rows="3"></textarea>
+      </div>
+      <!-- Key point -->
+      <div class="form-group">
+        <label class="form-label">こだわりポイント ✦</label>
+        <input class="form-input" type="text" id="postPoint" placeholder="特にアピールしたいこと" maxlength="120">
+        <div class="form-hint">This is highlighted prominently on your post</div>
+      </div>
+      <!-- Tags -->
+      <div class="form-group">
+        <label class="form-label">TAGS</label>
+        <div class="tags-wrap" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+          <input class="tags-input" id="tagInput" placeholder="Type & press Enter" maxlength="20"
+                 onkeydown="handleTagInput(event)">
+        </div>
+        <div class="form-hint">Press Enter to add each tag · Max 8 tags</div>
+      </div>
+      <div class="form-error" id="postError"></div>
+      <button class="btn-submit" id="btnSubmitPost" onclick="submitPost()">PUBLISH BUILD</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">EDIT PROFILE</span>
+      <button class="modal-close" onclick="closeModal('editProfileModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">DISPLAY NAME</label>
+        <input class="form-input" type="text" id="editName" maxlength="40">
+      </div>
+      <div class="form-group">
+        <label class="form-label">BIO</label>
+        <textarea class="form-textarea" id="editBio" rows="3" maxlength="200" placeholder="Tell the world about your builds..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">COUNTRY</label>
+        <select class="form-select" id="editCountry"></select>
+      </div>
+      <div class="form-error" id="editProfileError"></div>
+      <button class="btn-submit" onclick="saveProfile()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL MODAL -->
+<div class="modal-overlay" id="postDetailModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <span class="modal-title" id="detailTitle">—</span>
+      <button class="modal-close" onclick="closeModal('postDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shareModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">📤 SHARE YOUR REACH</span>
+      <button class="modal-close" onclick="closeModal('shareModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Share card preview -->
+      <div class="share-card" id="shareCardPreview">
+        <div class="share-card-logo">PLAMO<span>X</span></div>
+        <div class="share-card-title">🌍 My Build Got Likes From</div>
+        <div class="share-card-flags" id="shareCardFlags">—</div>
+        <div class="share-card-count" id="shareCardCount">0</div>
+        <div class="share-card-label">COUNTRIES</div>
+        <div class="share-hashtags" id="shareCardHashtags">#PLAMOX #Gunpla</div>
+      </div>
+      <!-- Copy text -->
+      <div style="margin-top:16px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">SNS COPY TEXT</div>
+      <div class="share-copy-text" id="shareCopyText">—</div>
+      <!-- Buttons -->
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn-submit" style="flex:1" onclick="copyShareText()">📋 COPY TEXT</button>
+        <button class="btn-social" style="flex:1;margin:0" onclick="shareToTwitter()">𝕏 POST TO X</button>
+      </div>
+      <!-- Badge unlocks -->
+      <div style="margin-top:20px">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">🏆 YOUR ACHIEVEMENTS</div>
+        <div id="shareAchievements" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-item active" id="mn-home" onclick="showPage('home');mnActive('mn-home')"><span class="mn-icon">⚡</span><span>FEED</span></button>
+  <button class="mobile-nav-item" id="mn-ranking" onclick="showPage('ranking');mnActive('mn-ranking')"><span class="mn-icon">🏆</span><span>RANK</span></button>
+  <button class="mobile-nav-item" id="mn-profile" onclick="showPage('profile');mnActive('mn-profile')"><span class="mn-icon">👤</span><span>MINE</span></button>
+  <button class="mobile-nav-item" id="mn-about" onclick="showPage('about');mnActive('mn-about')"><span class="mn-icon">◈</span><span>INFO</span></button>
+</nav>
+
+<!-- Firebase SDK (ESM via CDN) -->
+<script type="module">
+// ═══════════════════════════════════════════════════════
+//  PLAMOX — Firebase Integration
+//  Replace FIREBASE_CONFIG values in config.js
+// ═══════════════════════════════════════════════════════
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, TwitterAuthProvider, signInWithPopup, updateProfile }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit, where, serverTimestamp, increment, runTransaction, writeBatch }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+// ── CONFIG ─────────────────────────────────────────────
+// Load from config.js — user fills in their Firebase project values
+let FIREBASE_CONFIG;
+try {
+  const mod = await import('./config.js');
+  FIREBASE_CONFIG = mod.default;
+} catch(e) {
+  // Demo mode: no Firebase config found
+  console.warn('[PLAMOX] config.js not found — running in demo mode');
+  FIREBASE_CONFIG = null;
+}
+
+// ── INIT ───────────────────────────────────────────────
+let app, auth, db, storage;
+let currentUser = null;
+let userData    = null; // Firestore user doc
+
+if (FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+  app     = initializeApp(FIREBASE_CONFIG);
+  auth    = getAuth(app);
+  db      = getFirestore(app);
+  storage = getStorage(app);
+  window._db = db; // expose for debug
+} else {
+  // Demo mode banner
+  document.body.insertAdjacentHTML('afterbegin',
+    `<div style="position:fixed;top:56px;left:0;right:0;z-index:500;background:rgba(255,200,64,0.12);border-bottom:1px solid rgba(255,200,64,0.3);padding:7px 20px;text-align:center;font-family:var(--font-mono);font-size:9px;color:var(--gold);letter-spacing:2px">
+      ⚠ DEMO MODE — config.js の Firebase設定を入力すると実際のデータが使えます
+    </div>`
+  );
+}
+
+// ── CONSTANTS ─────────────────────────────────────────
+const GP_PER_DAY = 5;
+const COUNTRIES = [
+  {code:'JP',flag:'🇯🇵',name:'Japan'},      {code:'US',flag:'🇺🇸',name:'USA'},
+  {code:'KR',flag:'🇰🇷',name:'Korea'},      {code:'CN',flag:'🇨🇳',name:'China'},
+  {code:'DE',flag:'🇩🇪',name:'Germany'},    {code:'FR',flag:'🇫🇷',name:'France'},
+  {code:'GB',flag:'🇬🇧',name:'UK'},         {code:'IT',flag:'🇮🇹',name:'Italy'},
+  {code:'BR',flag:'🇧🇷',name:'Brazil'},     {code:'AU',flag:'🇦🇺',name:'Australia'},
+  {code:'CA',flag:'🇨🇦',name:'Canada'},     {code:'ES',flag:'🇪🇸',name:'Spain'},
+  {code:'MX',flag:'🇲🇽',name:'Mexico'},     {code:'IN',flag:'🇮🇳',name:'India'},
+  {code:'ID',flag:'🇮🇩',name:'Indonesia'},  {code:'TH',flag:'🇹🇭',name:'Thailand'},
+  {code:'PH',flag:'🇵🇭',name:'Philippines'},{code:'TW',flag:'🇹🇼',name:'Taiwan'},
+  {code:'SG',flag:'🇸🇬',name:'Singapore'},  {code:'HK',flag:'🇭🇰',name:'Hong Kong'},
+  {code:'RU',flag:'🇷🇺',name:'Russia'},     {code:'PL',flag:'🇵🇱',name:'Poland'},
+  {code:'NL',flag:'🇳🇱',name:'Netherlands'},{code:'SE',flag:'🇸🇪',name:'Sweden'},
+  {code:'NO',flag:'🇳🇴',name:'Norway'},     {code:'FI',flag:'🇫🇮',name:'Finland'},
+  {code:'DK',flag:'🇩🇰',name:'Denmark'},    {code:'CH',flag:'🇨🇭',name:'Switzerland'},
+  {code:'AT',flag:'🇦🇹',name:'Austria'},    {code:'NZ',flag:'🇳🇿',name:'New Zealand'},
+  {code:'ZA',flag:'🇿🇦',name:'South Africa'},{code:'NG',flag:'🇳🇬',name:'Nigeria'},
+  {code:'EG',flag:'🇪🇬',name:'Egypt'},      {code:'SA',flag:'🇸🇦',name:'Saudi Arabia'},
+  {code:'AR',flag:'🇦🇷',name:'Argentina'},  {code:'CL',flag:'🇨🇱',name:'Chile'},
+  {code:'CO',flag:'🇨🇴',name:'Colombia'},   {code:'PT',flag:'🇵🇹',name:'Portugal'},
+  {code:'GR',flag:'🇬🇷',name:'Greece'},     {code:'TR',flag:'🇹🇷',name:'Türkiye'},
+  {code:'UA',flag:'🇺🇦',name:'Ukraine'},    {code:'CZ',flag:'🇨🇿',name:'Czechia'},
+  {code:'HU',flag:'🇭🇺',name:'Hungary'},    {code:'RO',flag:'🇷🇴',name:'Romania'},
+  {code:'MY',flag:'🇲🇾',name:'Malaysia'},   {code:'VN',flag:'🇻🇳',name:'Vietnam'},
+  {code:'PK',flag:'🇵🇰',name:'Pakistan'},   {code:'BD',flag:'🇧🇩',name:'Bangladesh'},
+  {code:'IR',flag:'🇮🇷',name:'Iran'},       {code:'IQ',flag:'🇮🇶',name:'Iraq'},
+];
+const countryMap = Object.fromEntries(COUNTRIES.map(c => [c.code, c]));
+function getCountryFlag(code){ return countryMap[code]?.flag || '🌐' }
+function getCountryName(code){ return countryMap[code]?.name || code }
+
+// ── I18N ──────────────────────────────────────────────
+const LANGS = {
+  ja:{code:'JA',flag:'🇯🇵',name:'日本語',t:{
+    nav_feed:'フィード', nav_ranking:'ランキング', nav_profile:'プロフィール', nav_about:'について',
+    tagline:'Build · Share · Connect',
+    sort_new:'新着', sort_top:'人気',
+    login:'ログイン / 登録',
+    latest_builds:'最新の作品',
+    loading:'読み込み中...',
+    no_builds:'まだ作品がありません — 最初の投稿者になろう！',
+    send_gp:'GPを送る', send_flag:'国旗を送る', detail:'詳細',
+    daily_gp:'デイリーGP', remaining:'残り', gp_today:'/ 5 GP 今日',
+    active_countries:'アクティブな国', top_builders:'トップビルダー',
+    no_data:'データなし',
+    global_ranking:'グローバルランキング',
+    top_builders_world:'世界のトップビルダー',
+    tab_works:'🏆 作品', tab_countries:'🌍 国別', tab_flags:'🏴 国旗数',
+    my_builds:'マイビルド', countries:'国', achievements:'実績',
+    edit:'✏ 編集', logout:'ログアウト',
+    login_to_view:'プロフィールを見るにはログインしてください',
+    new_build:'新しい作品を投稿',
+    photo:'写真 *', click_or_drag:'クリックまたはドラッグ＆ドロップ',
+    img_limit:'JPG / PNG / WEBP · 最大5MB',
+    work_title:'作品タイトル *', category:'カテゴリ *', scale:'スケール',
+    description:'説明', key_point:'こだわりポイント ✦',
+    key_point_hint:'特にアピールしたいことが投稿に目立って表示されます',
+    tags:'タグ', tags_hint:'Enterキーで追加 · 最大8個',
+    publish:'作品を公開する',
+    account:'アカウント', login_tab:'ログイン', signup_tab:'新規登録',
+    display_name:'表示名', email:'メールアドレス', password:'パスワード',
+    create_account:'アカウントを作成',
+    edit_profile:'プロフィール編集', bio:'自己紹介', country:'国', save:'保存',
+    likes_from:'🌍 いいねした国',
+    concept:'コンセプト', how_it_works:'使い方',
+    works:'作品', total_gp:'合計GP',
+    no_gp:'本日のGPは使い切りました — 明日また来てね！',
+    gp_sent:'⚡ GPを送りました！',
+    flag_sent:'国旗を送りました！',
+    post_published:'作品を投稿しました！ ⚡',
+    profile_updated:'プロフィールを更新しました ✓',
+    deleted:'投稿を削除しました',
+    delete_confirm:'この投稿を削除しますか？',
+  }},
+  en:{code:'EN',flag:'🇺🇸',name:'English',t:{
+    nav_feed:'Feed', nav_ranking:'Ranking', nav_profile:'Profile', nav_about:'About',
+    tagline:'Build · Share · Connect',
+    sort_new:'NEW', sort_top:'TOP',
+    login:'LOGIN / SIGN UP',
+    latest_builds:'LATEST BUILDS',
+    loading:'LOADING...',
+    no_builds:'NO BUILDS YET — BE THE FIRST!',
+    send_gp:'SEND GP', send_flag:'SEND FLAG', detail:'DETAIL',
+    daily_gp:'DAILY GP', remaining:'REMAINING', gp_today:'/ 5 GP TODAY',
+    active_countries:'ACTIVE COUNTRIES', top_builders:'TOP BUILDERS',
+    no_data:'No data yet',
+    global_ranking:'GLOBAL RANKING',
+    top_builders_world:'TOP BUILDERS FROM AROUND THE WORLD',
+    tab_works:'🏆 WORKS', tab_countries:'🌍 COUNTRIES', tab_flags:'🏴 MOST FLAGS',
+    my_builds:'BUILDS', countries:'COUNTRIES', achievements:'ACHIEVEMENTS',
+    edit:'✏ EDIT', logout:'LOGOUT',
+    login_to_view:'LOGIN TO VIEW YOUR PROFILE',
+    new_build:'NEW BUILD',
+    photo:'PHOTO *', click_or_drag:'CLICK OR DRAG & DROP',
+    img_limit:'JPG / PNG / WEBP · MAX 5MB',
+    work_title:'WORK TITLE *', category:'CATEGORY *', scale:'SCALE',
+    description:'DESCRIPTION', key_point:'KEY POINT ✦',
+    key_point_hint:'This is highlighted prominently on your post',
+    tags:'TAGS', tags_hint:'Press Enter to add each tag · Max 8 tags',
+    publish:'PUBLISH BUILD',
+    account:'ACCOUNT', login_tab:'LOGIN', signup_tab:'SIGN UP',
+    display_name:'DISPLAY NAME', email:'EMAIL', password:'PASSWORD',
+    create_account:'CREATE ACCOUNT',
+    edit_profile:'EDIT PROFILE', bio:'BIO', country:'COUNTRY', save:'SAVE',
+    likes_from:'🌍 LIKES FROM',
+    concept:'CONCEPT', how_it_works:'HOW IT WORKS',
+    works:'WORKS', total_gp:'TOTAL GP',
+    no_gp:'No GP remaining today — come back tomorrow!',
+    gp_sent:'⚡ GP sent!',
+    flag_sent:'Flag sent!',
+    post_published:'Build posted! ⚡',
+    profile_updated:'Profile updated ✓',
+    deleted:'Post deleted',
+    delete_confirm:'Delete this post?',
+  }},
+  ko:{code:'KO',flag:'🇰🇷',name:'한국어',t:{
+    nav_feed:'피드', nav_ranking:'랭킹', nav_profile:'프로필', nav_about:'소개',
+    tagline:'Build · Share · Connect',
+    sort_new:'최신', sort_top:'인기',
+    login:'로그인 / 가입',
+    latest_builds:'최신 작품',
+    loading:'로딩 중...',
+    no_builds:'아직 작품이 없습니다 — 첫 번째가 되세요!',
+    send_gp:'GP 보내기', send_flag:'국기 보내기', detail:'상세',
+    daily_gp:'데일리 GP', remaining:'남은', gp_today:'/ 5 GP 오늘',
+    active_countries:'활성 국가', top_builders:'탑 빌더',
+    no_data:'데이터 없음',
+    global_ranking:'글로벌 랭킹',
+    top_builders_world:'전 세계 탑 빌더',
+    tab_works:'🏆 작품', tab_countries:'🌍 국가별', tab_flags:'🏴 국기 수',
+    my_builds:'작품', countries:'국가', achievements:'업적',
+    edit:'✏ 편집', logout:'로그아웃',
+    login_to_view:'프로필을 보려면 로그인하세요',
+    new_build:'새 작품',
+    photo:'사진 *', click_or_drag:'클릭 또는 드래그 & 드롭',
+    img_limit:'JPG / PNG / WEBP · 최대 5MB',
+    work_title:'작품 제목 *', category:'카테고리 *', scale:'스케일',
+    description:'설명', key_point:'핵심 포인트 ✦',
+    key_point_hint:'게시물에 눈에 띄게 표시됩니다',
+    tags:'태그', tags_hint:'Enter 키로 추가 · 최대 8개',
+    publish:'작품 공개',
+    account:'계정', login_tab:'로그인', signup_tab:'회원가입',
+    display_name:'표시 이름', email:'이메일', password:'비밀번호',
+    create_account:'계정 만들기',
+    edit_profile:'프로필 편집', bio:'소개', country:'국가', save:'저장',
+    likes_from:'🌍 좋아요 국가',
+    concept:'컨셉', how_it_works:'사용 방법',
+    works:'작품', total_gp:'총 GP',
+    no_gp:'오늘 GP를 모두 사용했습니다 — 내일 다시 오세요!',
+    gp_sent:'⚡ GP를 보냈습니다!',
+    flag_sent:'국기를 보냈습니다!',
+    post_published:'작품이 게시되었습니다! ⚡',
+    profile_updated:'프로필이 업데이트되었습니다 ✓',
+    deleted:'게시물이 삭제되었습니다',
+    delete_confirm:'이 게시물을 삭제하시겠습니까?',
+  }},
+  zh:{code:'ZH',flag:'🇨🇳',name:'中文',t:{
+    nav_feed:'动态', nav_ranking:'排行榜', nav_profile:'我的', nav_about:'关于',
+    tagline:'构建·分享·连接',
+    sort_new:'最新', sort_top:'热门',
+    login:'登录 / 注册',
+    latest_builds:'最新作品',
+    loading:'加载中...',
+    no_builds:'暂无作品 — 成为第一个！',
+    send_gp:'送GP', send_flag:'送国旗', detail:'详情',
+    daily_gp:'每日GP', remaining:'剩余', gp_today:'/ 5 GP 今天',
+    active_countries:'活跃国家', top_builders:'顶级创作者',
+    no_data:'暂无数据',
+    global_ranking:'全球排行榜',
+    top_builders_world:'来自世界各地的顶级创作者',
+    tab_works:'🏆 作品', tab_countries:'🌍 国家', tab_flags:'🏴 国旗数',
+    my_builds:'作品', countries:'国家', achievements:'成就',
+    edit:'✏ 编辑', logout:'退出',
+    login_to_view:'登录查看您的个人资料',
+    new_build:'新作品',
+    photo:'照片 *', click_or_drag:'点击或拖拽上传',
+    img_limit:'JPG / PNG / WEBP · 最大5MB',
+    work_title:'作品标题 *', category:'分类 *', scale:'比例',
+    description:'描述', key_point:'亮点 ✦',
+    key_point_hint:'将在帖子中突出显示',
+    tags:'标签', tags_hint:'按Enter添加 · 最多8个',
+    publish:'发布作品',
+    account:'账号', login_tab:'登录', signup_tab:'注册',
+    display_name:'显示名称', email:'邮箱', password:'密码',
+    create_account:'创建账号',
+    edit_profile:'编辑资料', bio:'简介', country:'国家', save:'保存',
+    likes_from:'🌍 来自',
+    concept:'理念', how_it_works:'使用方法',
+    works:'作品', total_gp:'总GP',
+    no_gp:'今天的GP已用完 — 明天再来！',
+    gp_sent:'⚡ GP已发送！',
+    flag_sent:'国旗已发送！',
+    post_published:'作品已发布！ ⚡',
+    profile_updated:'资料已更新 ✓',
+    deleted:'帖子已删除',
+    delete_confirm:'确定删除此帖子？',
+  }},
+  de:{code:'DE',flag:'🇩🇪',name:'Deutsch',t:{
+    nav_feed:'Feed', nav_ranking:'Ranking', nav_profile:'Profil', nav_about:'Über uns',
+    tagline:'Bauen · Teilen · Verbinden',
+    sort_new:'NEU', sort_top:'TOP',
+    login:'LOGIN / REGISTRIEREN',
+    latest_builds:'NEUESTE WERKE',
+    loading:'LADEN...',
+    no_builds:'Noch keine Werke — Sei der Erste!',
+    send_gp:'GP SENDEN', send_flag:'FLAGGE SENDEN', detail:'DETAIL',
+    daily_gp:'TAGES-GP', remaining:'VERBLEIBEND', gp_today:'/ 5 GP HEUTE',
+    active_countries:'AKTIVE LÄNDER', top_builders:'TOP BUILDER',
+    no_data:'Keine Daten',
+    global_ranking:'GLOBALES RANKING',
+    top_builders_world:'TOP BUILDER AUS ALLER WELT',
+    tab_works:'🏆 WERKE', tab_countries:'🌍 LÄNDER', tab_flags:'🏴 MEISTE FLAGGEN',
+    my_builds:'WERKE', countries:'LÄNDER', achievements:'ERFOLGE',
+    edit:'✏ BEARBEITEN', logout:'ABMELDEN',
+    login_to_view:'Zum Anzeigen des Profils anmelden',
+    new_build:'NEUES WERK',
+    photo:'FOTO *', click_or_drag:'KLICKEN ODER DRAG & DROP',
+    img_limit:'JPG / PNG / WEBP · MAX 5MB',
+    work_title:'WERKTITEL *', category:'KATEGORIE *', scale:'MAßSTAB',
+    description:'BESCHREIBUNG', key_point:'HIGHLIGHT ✦',
+    key_point_hint:'Wird in Ihrem Beitrag hervorgehoben',
+    tags:'TAGS', tags_hint:'Enter drücken zum Hinzufügen · Max. 8 Tags',
+    publish:'WERK VERÖFFENTLICHEN',
+    account:'KONTO', login_tab:'LOGIN', signup_tab:'REGISTRIEREN',
+    display_name:'ANZEIGENAME', email:'E-MAIL', password:'PASSWORT',
+    create_account:'KONTO ERSTELLEN',
+    edit_profile:'PROFIL BEARBEITEN', bio:'BIO', country:'LAND', save:'SPEICHERN',
+    likes_from:'🌍 LIKES AUS',
+    concept:'KONZEPT', how_it_works:'SO FUNKTIONIERT ES',
+    works:'WERKE', total_gp:'GESAMT-GP',
+    no_gp:'Heute keine GP mehr — komm morgen wieder!',
+    gp_sent:'⚡ GP gesendet!',
+    flag_sent:'Flagge gesendet!',
+    post_published:'Werk veröffentlicht! ⚡',
+    profile_updated:'Profil aktualisiert ✓',
+    deleted:'Beitrag gelöscht',
+    delete_confirm:'Diesen Beitrag löschen?',
+  }},
+};
+let currentLang = 'ja';
+function T(key){ return LANGS[currentLang]?.t[key] || LANGS.en.t[key] || key }
+
+function applyLang(){
+  // data-i18n attributes
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    const val = T(key);
+    if(val) el.textContent = val;
+  });
+  // data-i18n-placeholder attributes
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-ph');
+    const val = T(key);
+    if(val) el.placeholder = val;
+  });
+  // html lang attribute
+  document.documentElement.lang = currentLang;
+}
+
+function buildLangDropdown(){
+  const dd = document.getElementById('langDropdown');
+  dd.innerHTML = Object.entries(LANGS).map(([k,l])=>
+    `<div class="lang-option${k===currentLang?' active':''}" onclick="setLang('${k}')">
+      <span>${l.flag}</span><span>${l.name}</span>
+      <span class="lang-native">${l.code}</span>
+    </div>`
+  ).join('');
+}
+window.toggleLang = function(){
+  document.getElementById('langSwitcher').classList.toggle('open');
+}
+window.setLang = function(lang){
+  currentLang = lang;
+  document.getElementById('langFlag').textContent = LANGS[lang].flag;
+  document.getElementById('langCode').textContent  = LANGS[lang].code;
+  document.getElementById('langSwitcher').classList.remove('open');
+  buildLangDropdown();
+  applyLang();
+  // Re-render feed labels
+  document.getElementById('feedTitle').textContent = T('latest_builds');
+}
+
+// ── AUTH STATE ─────────────────────────────────────────
+if(auth){
+  onAuthStateChanged(auth, async user => {
+    currentUser = user;
+    if(user){
+      await ensureUserDoc(user);
+      userData = await loadUserData(user.uid);
+      onLogin();
+    } else {
+      onLogout();
+    }
+  });
+}
+
+async function ensureUserDoc(user){
+  if(!db) return;
+  const ref = doc(db,'users',user.uid);
+  const snap = await getDoc(ref);
+  if(!snap.exists()){
+    const today = todayStr();
+    await setDoc(ref,{
+      uid: user.uid,
+      displayName: user.displayName || 'Builder',
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      country: 'JP',
+      bio: '',
+      totalGP: 0,
+      totalPosts: 0,
+      collectedFlags: {},
+      gpToday: GP_PER_DAY,
+      gpDate: today,
+      createdAt: serverTimestamp(),
+    });
+  }
+}
+
+async function loadUserData(uid){
+  if(!db) return null;
+  const snap = await getDoc(doc(db,'users',uid));
+  return snap.exists() ? {id:snap.id,...snap.data()} : null;
+}
+
+function todayStr(){ return new Date().toISOString().slice(0,10) }
+
+function getGPRemaining(){
+  if(!userData) return 0;
+  if(userData.gpDate !== todayStr()) return GP_PER_DAY;
+  return userData.gpToday ?? GP_PER_DAY;
+}
+
+function onLogin(){
+  // Nav
+  document.getElementById('navAuthArea').innerHTML =
+    `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showPage('profile')">
+      <div class="nav-avatar">${userData?.photoURL ? `<img src="${userData.photoURL}">` : '👤'}</div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink2)">${userData?.displayName||'Builder'}</span>
+    </div>
+    <button class="btn-outline" style="width:auto;padding:5px 10px;margin-top:0;font-size:8px" onclick="doSignOut()">LOGOUT</button>`;
+  document.getElementById('btnPost').style.display = '';
+  document.getElementById('navGP').style.display = '';
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('gpWidget').style.display = '';
+  updateGPDisplay();
+  renderProfile();
+  closeModal('authModal');
+  toast('Welcome back, ' + (userData?.displayName||'Builder') + ' ⚡');
+}
+
+function onLogout(){
+  userData = null;
+  document.getElementById('navAuthArea').innerHTML =
+    `<button class="btn-auth" onclick="openModal('authModal')">${T('login')||'LOGIN / SIGN UP'}</button>`;
+  document.getElementById('btnPost').style.display = 'none';
+  document.getElementById('navGP').style.display = 'none';
+  document.getElementById('heroSection').style.display = '';
+  document.getElementById('gpWidget').style.display = 'none';
+  document.getElementById('profileNotLoggedIn').style.display = '';
+  document.getElementById('profileLoggedIn').style.display = 'none';
+}
+
+function updateGPDisplay(){
+  const gp = getGPRemaining();
+  document.getElementById('gpNum').textContent = gp;
+  document.getElementById('navGPNum').textContent = gp;
+  document.getElementById('gpBannerNum').textContent = gp;
+  const pct = (gp/GP_PER_DAY*100)+'%';
+  document.getElementById('gpBar').style.width = pct;
+  document.getElementById('gpBannerBar').style.width = pct;
+  document.getElementById('gpSub').textContent = `${gp} / ${GP_PER_DAY} GP TODAY`;
+  // Update pip indicators
+  for(let i=1;i<=5;i++){
+    const pip = document.getElementById('gpPip'+i);
+    if(pip){
+      if(i<=gp){
+        pip.style.background='rgba(255,200,64,0.8)';
+        pip.style.borderColor='var(--gold)';
+        pip.style.boxShadow='0 0 6px rgba(255,200,64,0.6)';
+      } else {
+        pip.style.background='rgba(255,200,64,0.1)';
+        pip.style.borderColor='rgba(255,200,64,0.2)';
+        pip.style.boxShadow='none';
+      }
+    }
+  }
+  document.getElementById('gpBanner').style.display = '';
+  updateDashGP();
+}
+
+// ── AUTH ACTIONS ───────────────────────────────────────
+window.emailLogin = async function(){
+  if(!auth){ toast('Demo mode — Firebase not connected'); return; }
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!email||!pass){ errEl.textContent = 'Please fill in all fields'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e){
+    errEl.textContent = e.code === 'auth/invalid-credential' ? 'Invalid email or password' : e.message;
+  }
+}
+
+window.emailSignup = async function(){
+  if(!auth){ toast('Demo mode — Firebase not connected'); return; }
+  const name  = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass  = document.getElementById('signupPassword').value;
+  const errEl = document.getElementById('signupError');
+  errEl.textContent = '';
+  if(!name||!email||!pass){ errEl.textContent = 'Please fill in all fields'; return; }
+  if(pass.length < 8){ errEl.textContent = 'Password must be 8+ characters'; return; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await ensureUserDoc(cred.user);
+    userData = await loadUserData(cred.user.uid);
+  } catch(e){
+    errEl.textContent = e.code === 'auth/email-already-in-use' ? 'Email already in use' : e.message;
+  }
+}
+
+window.authWithGoogle = async function(){
+  if(!auth){ toast('Demo mode — Firebase not connected'); return; }
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch(e){ toast(e.message); }
+}
+
+window.authWithTwitter = async function(){
+  if(!auth){ toast('Demo mode — Enable Twitter auth in Firebase Console'); return; }
+  try {
+    await signInWithPopup(auth, new TwitterAuthProvider());
+  } catch(e){ toast(e.code === 'auth/operation-not-allowed' ? 'Twitter auth not enabled in Firebase Console' : e.message); }
+}
+
+window.doSignOut = async function(){
+  if(auth) await signOut(auth);
+  toast('Logged out');
+}
+
+// ── POST SUBMIT ────────────────────────────────────────
+let selectedImgFile = null;
+const postTags = [];
+
+window.handleImgSelect = function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ toast('Image must be under 5MB'); return; }
+  selectedImgFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('previewImg').src = url;
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('uploadPreview').style.display = '';
+}
+window.handleImgDrop = function(e){
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if(f && f.type.startsWith('image/')){
+    document.getElementById('imgFileInput').files = e.dataTransfer.files;
+    handleImgSelect({target:{files:e.dataTransfer.files}});
+  }
+  document.getElementById('uploadZone').classList.remove('drag');
+}
+window.removeImg = function(){
+  selectedImgFile = null;
+  document.getElementById('imgFileInput').value = '';
+  document.getElementById('uploadZone').style.display = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+}
+
+window.handleTagInput = function(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const val = document.getElementById('tagInput').value.trim().replace(/[,]/g,'');
+    if(!val||postTags.includes(val)||postTags.length>=8) return;
+    postTags.push(val);
+    renderTagChips();
+    document.getElementById('tagInput').value = '';
+  }
+}
+function renderTagChips(){
+  const wrap = document.getElementById('tagsWrap');
+  wrap.querySelectorAll('.tag-chip').forEach(el=>el.remove());
+  const input = document.getElementById('tagInput');
+  postTags.forEach((tag,i) => {
+    const chip = document.createElement('div');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `<span>${tag}</span><span class="tag-chip-remove" onclick="removeTag(${i})">✕</span>`;
+    wrap.insertBefore(chip, input);
+  });
+}
+window.removeTag = function(i){
+  postTags.splice(i,1); renderTagChips();
+}
+
+window.submitPost = async function(){
+  if(!currentUser){ toast('Please login first'); return; }
+  const title    = document.getElementById('postTitle').value.trim();
+  const category = document.getElementById('postCategory').value;
+  const scale    = document.getElementById('postScale').value;
+  const desc     = document.getElementById('postDesc').value.trim();
+  const point    = document.getElementById('postPoint').value.trim();
+  const errEl    = document.getElementById('postError');
+  errEl.textContent = '';
+
+  if(!title){ errEl.textContent = 'Title is required'; return; }
+  if(!category){ errEl.textContent = 'Please select a category'; return; }
+  if(!selectedImgFile){ errEl.textContent = 'Please add a photo'; return; }
+
+  const btn = document.getElementById('btnSubmitPost');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> UPLOADING...';
+
+  try {
+    let imageURL = '';
+    if(storage && selectedImgFile){
+      const imgRef = ref(storage, `posts/${currentUser.uid}/${Date.now()}_${selectedImgFile.name}`);
+      const snap = await new Promise((res,rej) => {
+        const task = uploadBytesResumable(imgRef, selectedImgFile);
+        task.on('state_changed', null, rej, () => res(task.snapshot));
+      });
+      imageURL = await getDownloadURL(snap.ref);
+    }
+
+    const postData = {
+      uid: currentUser.uid,
+      displayName: userData?.displayName || 'Builder',
+      photoURL: userData?.photoURL || '',
+      country: userData?.country || 'JP',
+      title,
+      category,
+      scale: scale||'',
+      desc,
+      point,
+      tags: [...postTags],
+      imageURL,
+      gp: 0,
+      flagsFrom: {},
+      createdAt: serverTimestamp(),
+    };
+
+    if(db){
+      await addDoc(collection(db,'posts'), postData);
+      // Update user post count
+      await updateDoc(doc(db,'users',currentUser.uid),{
+        totalPosts: increment(1)
+      });
+    }
+
+    // Reset form
+    removeImg();
+    document.getElementById('postTitle').value    = '';
+    document.getElementById('postCategory').value = '';
+    document.getElementById('postScale').value    = '';
+    document.getElementById('postDesc').value     = '';
+    document.getElementById('postPoint').value    = '';
+    postTags.length = 0; renderTagChips();
+    closeModal('postModal');
+    toast(T('post_published'));
+  } catch(e){
+    errEl.textContent = 'Upload failed: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'PUBLISH BUILD';
+  }
+}
+
+// ── FEED ───────────────────────────────────────────────
+let feedSort = 'new';
+let feedUnsubscribe = null;
+
+function loadFeed(){
+  if(!db){ renderDemoFeed(); return; }
+  if(feedUnsubscribe) feedUnsubscribe();
+  document.getElementById('feedContainer').innerHTML = '<div class="feed-loading">LOADING BUILDS...</div>';
+  const order = feedSort === 'new' ? 'createdAt' : 'gp';
+  const q = query(collection(db,'posts'), orderBy(order,'desc'), limit(30));
+  feedUnsubscribe = onSnapshot(q, snap => {
+    const posts = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderFeed(posts);
+    updateStats(posts);
+    renderSidebarCountries(posts);
+    renderSidebarBuilders(posts);
+  });
+}
+
+window.setSort = function(sort, btn){
+  feedSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadFeed();
+}
+
+function timeAgo(ts){
+  if(!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const sec = Math.floor((Date.now()-d)/1000);
+  if(sec<60) return `${sec}s ago`;
+  if(sec<3600) return `${Math.floor(sec/60)}m ago`;
+  if(sec<86400) return `${Math.floor(sec/3600)}h ago`;
+  return `${Math.floor(sec/86400)}d ago`;
+}
+
+function renderFeed(posts){
+  const el = document.getElementById('feedContainer');
+  if(!posts.length){
+    el.innerHTML = `<div class="feed-empty"><div class="feed-empty-icon">🔧</div>NO BUILDS YET — BE THE FIRST!</div>`;
+    return;
+  }
+  el.innerHTML = posts.map((p,i) => renderPostCard(p, i)).join('');
+}
+
+function renderPostCard(p, delay=0){
+  const flags = Object.entries(p.flagsFrom||{})
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,12)
+    .map(([code,cnt])=>`<div class="fr-flag">${getCountryFlag(code)}<span class="fr-count">${cnt}</span></div>`)
+    .join('');
+
+  const tags = [
+    p.scale ? `<span class="post-tag scale">${p.scale}</span>` : '',
+    p.category ? `<span class="post-tag cat">${p.category}</span>` : '',
+    ...(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`)
+  ].filter(Boolean).join('');
+
+  return `
+  <div class="post" style="animation-delay:${delay*0.05}s" onclick="openPostDetail('${p.id}')">
+    <div class="post-img-wrap">
+      ${p.imageURL
+        ? `<img src="${p.imageURL}" alt="${p.title}" loading="lazy">`
+        : `<div class="post-no-img">PX</div>`}
+    </div>
+    <div class="post-header" onclick="event.stopPropagation()">
+      <div class="post-user">
+        <div class="post-avatar">${p.photoURL?`<img src="${p.photoURL}">`:'👤'}</div>
+        <div>
+          <div class="post-username">${p.displayName||'Builder'} ${getCountryFlag(p.country||'')}</div>
+          <div class="post-time">${timeAgo(p.createdAt)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-work-title">${p.title}</div>
+      ${tags ? `<div class="post-meta">${tags}</div>` : ''}
+      ${p.desc ? `<div class="post-desc">${p.desc}</div>` : ''}
+      ${p.point ? `<div class="post-point">✦ ${p.point}</div>` : ''}
+    </div>
+    ${flags ? `<div class="post-fr"><div class="post-fr-label">🌍 LIKES FROM</div><div class="fr-flags">${flags}</div></div>` : ''}
+    <div class="post-actions" onclick="event.stopPropagation()">
+      <button class="action-btn" onclick="sendGP('${p.id}')">
+        <span class="icon">⚡</span>
+        <span>GP</span>
+        <span class="action-count">${p.gp||0}</span>
+      </button>
+      <button class="action-btn" onclick="sendFlag('${p.id}')">
+        <span class="icon">${getCountryFlag(userData?.country||'JP')}</span>
+        <span>FLAG</span>
+      </button>
+      <button class="action-btn" onclick="openPostDetail('${p.id}');event.stopPropagation()">
+        <span class="icon">🔍</span><span>DETAIL</span>
+      </button>
+      ${currentUser?.uid === p.uid ? `<button class="btn-danger" onclick="deletePost('${p.id}');event.stopPropagation()">🗑</button>` : ''}
+    </div>
+  </div>`;
+}
+
+// ── GP & FLAG ACTIONS ─────────────────────────────────
+window.sendGP = async function(postId){
+  if(!currentUser){ toast('Login to send GP'); return; }
+  const gp = getGPRemaining();
+  if(gp <= 0){ toast('No GP remaining today — come back tomorrow!'); return; }
+  if(!db){ toast('Demo mode — Firebase not connected'); return; }
+
+  try {
+    await runTransaction(db, async tx => {
+      const postRef = doc(db,'posts',postId);
+      const userRef = doc(db,'users',currentUser.uid);
+      const postSnap = await tx.get(postRef);
+      const userSnap = await tx.get(userRef);
+      if(!postSnap.exists()||!userSnap.exists()) throw 'not found';
+      const ud = userSnap.data();
+      let remaining = ud.gpDate === todayStr() ? (ud.gpToday??GP_PER_DAY) : GP_PER_DAY;
+      if(remaining <= 0) throw 'no gp';
+      tx.update(postRef, { gp: increment(1) });
+      tx.update(userRef, { gpToday: remaining-1, gpDate: todayStr() });
+      // Update post owner's totalGP
+      const ownerId = postSnap.data().uid;
+      if(ownerId !== currentUser.uid){
+        tx.update(doc(db,'users',ownerId), { totalGP: increment(1) });
+      }
+    });
+    userData = await loadUserData(currentUser.uid);
+    updateGPDisplay();
+    toast(T('gp_sent'));
+  } catch(e){
+    if(e==='no gp') toast(T('no_gp'));
+    else toast('Error: ' + e);
+  }
+}
+
+window.sendFlag = async function(postId){
+  if(!currentUser){ toast('Login to send flag'); return; }
+  const countryCode = userData?.country || 'JP';
+  if(!db){ toast('Demo mode — Firebase not connected'); return; }
+
+  // 1アカウント1投稿につき1回限りチェック
+  // users/{uid}/flagsSent/{postId} に送信済み記録を保存
+  const sentRef = doc(db, 'users', currentUser.uid, 'flagsSent', postId);
+
+  try {
+    await runTransaction(db, async tx => {
+      const sentSnap = await tx.get(sentRef);
+      if(sentSnap.exists()){
+        throw new Error('ALREADY_SENT');
+      }
+
+      const postRef  = doc(db, 'posts', postId);
+      const postSnap = await tx.get(postRef);
+      if(!postSnap.exists()) throw new Error('POST_NOT_FOUND');
+
+      const ownerId = postSnap.data().uid;
+
+      // 投稿の flagsFrom を更新
+      tx.update(postRef, {
+        [`flagsFrom.${countryCode}`]: increment(1)
+      });
+
+      // 投稿者の collectedFlags を更新
+      tx.update(doc(db, 'users', ownerId), {
+        [`collectedFlags.${countryCode}`]: increment(1)
+      });
+
+      // 送信済み記録を保存（再送防止）
+      tx.set(sentRef, {
+        postId,
+        countryCode,
+        sentAt: serverTimestamp()
+      });
+    });
+
+    // ボタンをグレーアウト
+    document.querySelectorAll(`[data-post-id="${postId}"] .btn-flag-action`).forEach(btn=>{
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.title = 'Already sent';
+    });
+
+    toast(`${getCountryFlag(countryCode)} ${T('flag_sent')}`);
+  } catch(e){
+    if(e.message === 'ALREADY_SENT'){
+      toast('⚠ ' + (currentLang==='ja' ? 'この投稿にはすでに国旗を送りました' : 'You already sent a flag to this post'));
+    } else {
+      toast('Error: ' + e.message);
+    }
+  }
+}
+
+// ── DELETE POST ────────────────────────────────────────
+window.deletePost = async function(postId){
+  if(!currentUser||!db) return;
+  if(!confirm(T('delete_confirm'))) return;
+  await deleteDoc(doc(db,'posts',postId));
+  await updateDoc(doc(db,'users',currentUser.uid),{ totalPosts: increment(-1) });
+  toast(T('deleted'));
+}
+
+// ── POST DETAIL ────────────────────────────────────────
+window.openPostDetail = async function(postId){
+  if(!db) return;
+  openModal('postDetailModal');
+  document.getElementById('detailBody').innerHTML = '<div class="feed-loading">LOADING...</div>';
+  const snap = await getDoc(doc(db,'posts',postId));
+  if(!snap.exists()){ document.getElementById('detailBody').innerHTML = 'Not found'; return; }
+  const p = {id:snap.id,...snap.data()};
+  document.getElementById('detailTitle').textContent = p.title;
+
+  const flagEntries = Object.entries(p.flagsFrom||{}).sort((a,b)=>b[1]-a[1]);
+  const flagBars = flagEntries.map(([code,cnt])=>{
+    const max = flagEntries[0]?.[1]||1;
+    const pct = Math.round(cnt/max*100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:18px;width:24px">${getCountryFlag(code)}</span>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink2);width:80px">${getCountryName(code)}</span>
+      <div style="flex:1;height:6px;background:var(--bg3);border:1px solid var(--border)">
+        <div style="width:${pct}%;height:100%;background:var(--accent);box-shadow:0 0 6px rgba(0,229,255,0.5)"></div>
+      </div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--accent);width:24px;text-align:right">${cnt}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detailBody').innerHTML = `
+    ${p.imageURL ? `<img src="${p.imageURL}" style="width:100%;max-height:300px;object-fit:cover;margin-bottom:16px">` : ''}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div class="post-avatar">${p.photoURL?`<img src="${p.photoURL}">`:'👤'}</div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">${p.displayName} ${getCountryFlag(p.country)}</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">${timeAgo(p.createdAt)}</div>
+      </div>
+      <div style="margin-left:auto;font-family:var(--font-head);font-size:22px;color:var(--gold)">⚡${p.gp||0}</div>
+    </div>
+    ${p.desc ? `<p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:12px">${p.desc}</p>` : ''}
+    ${p.point ? `<div class="post-point" style="margin-bottom:16px">✦ ${p.point}</div>` : ''}
+    ${flagBars ? `<div style="margin-top:20px"><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:12px">🌍 LIKES FROM THE WORLD</div>${flagBars}</div>` : ''}
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="action-btn" style="flex:1;justify-content:center" onclick="sendGP('${p.id}')">⚡ SEND GP</button>
+      <button class="btn-send-flag" onclick="sendFlag('${p.id}')">🏴 ${getCountryFlag(userData?.country||'JP')} SEND FLAG</button>
+    </div>`;
+}
+
+// ── STATS / SIDEBAR ────────────────────────────────────
+function updateStats(posts){
+  // Hero stats（未ログイン時のhero section）
+  document.getElementById('statPosts').textContent = posts.length;
+  const uids = [...new Set(posts.map(p=>p.uid))];
+  document.getElementById('statUsers').textContent = uids.length;
+  const countries = [...new Set(posts.flatMap(p=>Object.keys(p.flagsFrom||{})))];
+  document.getElementById('statCountries').textContent = countries.length;
+
+  // ── DASHBOARD STATS ──
+  updateDashboard(posts);
+}
+
+function updateDashboard(posts){
+  // ① 世界の参加人口
+  const uniqueBuilders = [...new Set(posts.map(p=>p.uid))];
+  const activeCountries = [...new Set(posts.flatMap(p=>Object.keys(p.flagsFrom||{})))];
+  const builderNum = document.getElementById('dashBuilders');
+  if(builderNum){
+    builderNum.textContent = uniqueBuilders.length >= 1000
+      ? (uniqueBuilders.length/1000).toFixed(1)+'K'
+      : uniqueBuilders.length;
+    document.getElementById('dashCountriesActive').textContent =
+      `${activeCountries.length} countries active`;
+    // バーは最大100人を100%として表示
+    document.getElementById('dashBuildersBar').style.width =
+      Math.min(uniqueBuilders.length/100*100,100)+'%';
+  }
+
+  // ② 自分が獲得した評価数（ログイン済みのとき）
+  if(currentUser && userData){
+    const myPosts = posts.filter(p=>p.uid===currentUser.uid);
+    const myFlagCounts = {};
+    myPosts.forEach(p=>{
+      Object.entries(p.flagsFrom||{}).forEach(([code,cnt])=>{
+        myFlagCounts[code]=(myFlagCounts[code]||0)+cnt;
+      });
+    });
+    const totalFlags = Object.values(myFlagCounts).reduce((s,v)=>s+v,0);
+    const flagCountries = Object.keys(myFlagCounts).length;
+    const flagsSorted = Object.entries(myFlagCounts).sort((a,b)=>b[1]-a[1]);
+    document.getElementById('dashMyFlags').textContent = totalFlags>=1000
+      ? (totalFlags/1000).toFixed(1)+'K' : totalFlags||'0';
+    document.getElementById('dashMyFlagSub').textContent =
+      `from ${flagCountries} ${flagCountries===1?'country':'countries'}`;
+    document.getElementById('dashFlagMini').innerHTML =
+      flagsSorted.slice(0,8).map(([code])=>
+        `<span title="${getCountryName(code)}">${getCountryFlag(code)}</span>`
+      ).join('');
+
+    // ③ 獲得GPの数
+    const myTotalGP = myPosts.reduce((s,p)=>s+(p.gp||0),0);
+    document.getElementById('dashMyGP').textContent = myTotalGP>=1000
+      ? (myTotalGP/1000).toFixed(1)+'K' : myTotalGP;
+    // ランク（全体のGP分布で位置を算出）
+    const allGPs = posts.reduce((acc,p)=>{
+      acc[p.uid]=(acc[p.uid]||0)+(p.gp||0); return acc;
+    },{});
+    const sorted = Object.values(allGPs).sort((a,b)=>b-a);
+    const maxGP = sorted[0]||1;
+    document.getElementById('dashGPBar').style.width = Math.min(myTotalGP/maxGP*100,100)+'%';
+    const myRank = sorted.filter(g=>g>myTotalGP).length+1;
+    document.getElementById('dashGPRank').textContent = `Global Rank #${myRank}`;
+  } else {
+    // 未ログイン時はグローバル合計を表示
+    const totalFlagsAll = posts.reduce((s,p)=>
+      s+Object.values(p.flagsFrom||{}).reduce((a,b)=>a+b,0),0);
+    document.getElementById('dashMyFlags').textContent = totalFlagsAll>=1000
+      ? (totalFlagsAll/1000).toFixed(1)+'K' : totalFlagsAll;
+    document.getElementById('dashMyFlagSub').textContent = 'total flags sent';
+    const topFlags = [...new Set(
+      posts.flatMap(p=>Object.keys(p.flagsFrom||{}))
+    )].slice(0,8);
+    document.getElementById('dashFlagMini').innerHTML =
+      topFlags.map(code=>`<span>${getCountryFlag(code)}</span>`).join('');
+
+    const totalGPAll = posts.reduce((s,p)=>s+(p.gp||0),0);
+    document.getElementById('dashMyGP').textContent = totalGPAll>=1000
+      ? (totalGPAll/1000).toFixed(1)+'K' : totalGPAll;
+    document.getElementById('dashGPRank').textContent = 'total GP distributed';
+    document.getElementById('dashGPBar').style.width = '60%';
+  }
+
+  // ④ 本日のGP残量（updateGPDisplay と連動）
+  updateDashGP();
+}
+
+function updateDashGP(){
+  const gp = getGPRemaining();
+  const remain = document.getElementById('dashGPRemain');
+  if(!remain) return;
+  remain.textContent = gp;
+  // pips
+  for(let i=1;i<=5;i++){
+    const pip = document.getElementById('dp'+i);
+    if(pip){
+      pip.classList.toggle('active', i<=gp);
+    }
+  }
+  // リセット時刻（日本時間 or ローカル深夜0時）
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24,0,0,0);
+  const diffH = Math.floor((midnight-now)/3600000);
+  const diffM = Math.floor(((midnight-now)%3600000)/60000);
+  const resetEl = document.getElementById('dashGPResetTime');
+  if(resetEl){
+    if(gp<=0){
+      resetEl.textContent = `Resets in ${diffH}h ${diffM}m`;
+      resetEl.style.color = 'var(--warm)';
+    } else {
+      resetEl.textContent = `${gp} left today`;
+      resetEl.style.color = 'var(--muted)';
+    }
+  }
+}
+
+function renderSidebarCountries(posts){
+  const countryCount = {};
+  posts.forEach(p => Object.keys(p.flagsFrom||{}).forEach(c=>{
+    countryCount[c] = (countryCount[c]||0) + (p.flagsFrom[c]||0);
+  }));
+  const sorted = Object.entries(countryCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  document.getElementById('activeCountries').innerHTML = sorted.map(([code,cnt])=>
+    `<div class="active-country">
+      <span class="ac-flag">${getCountryFlag(code)}</span>
+      <span class="ac-name">${getCountryName(code)}</span>
+      <span class="ac-count">${cnt}</span>
+    </div>`
+  ).join('') || '<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">No data yet</div>';
+}
+
+function renderSidebarBuilders(posts){
+  const builderGP = {};
+  const builderNames = {};
+  posts.forEach(p => {
+    builderGP[p.uid] = (builderGP[p.uid]||0) + (p.gp||0);
+    builderNames[p.uid] = p.displayName;
+  });
+  const sorted = Object.entries(builderGP).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('topBuilders').innerHTML = sorted.map(([uid,gp])=>
+    `<div class="active-country">
+      <span class="ac-flag">👤</span>
+      <span class="ac-name">${builderNames[uid]||'Builder'}</span>
+      <span class="ac-count">⚡${gp}</span>
+    </div>`
+  ).join('') || '<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">No data yet</div>';
+}
+
+// ── RANKING ────────────────────────────────────────────
+let rankTab = 'works';
+async function loadRanking(){
+  if(!db){ renderDemoRanking(); return; }
+  document.getElementById('rankingContainer').innerHTML = '<div class="feed-loading">LOADING...</div>';
+  const q = query(collection(db,'posts'), orderBy('gp','desc'), limit(50));
+  const snap = await getDocs(q);
+  const posts = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderRanking(posts);
+}
+
+window.setRankTab = function(tab, btn){
+  rankTab = tab;
+  document.querySelectorAll('.rank-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadRanking();
+}
+
+function renderRanking(posts){
+  let items = [];
+  if(rankTab === 'works'){
+    items = posts.map((p,i) => ({
+      num:i+1, name:p.title, sub:p.displayName+' '+getCountryFlag(p.country||''),
+      score:p.gp||0, label:'GP', img:p.imageURL, id:p.id
+    }));
+  } else if(rankTab === 'countries'){
+    const cc = {};
+    posts.forEach(p => Object.entries(p.flagsFrom||{}).forEach(([code,cnt])=>{
+      cc[code] = (cc[code]||0) + cnt;
+    }));
+    items = Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([code,cnt],i)=>({
+      num:i+1, name:getCountryName(code), sub:getCountryFlag(code), score:cnt, label:'FLAGS'
+    }));
+  } else {
+    // Most flags received
+    const fc = {};
+    const ft = {};
+    posts.forEach(p => {
+      const n = Object.keys(p.flagsFrom||{}).length;
+      fc[p.id] = n;
+      ft[p.id] = {title:p.title, user:p.displayName, img:p.imageURL};
+    });
+    items = Object.entries(fc).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([id,n],i)=>({
+      num:i+1, name:ft[id].title, sub:ft[id].user, score:n, label:'COUNTRIES', img:ft[id].img, id
+    }));
+  }
+
+  document.getElementById('rankingContainer').innerHTML = items.map(item=>`
+    <div class="rank-item${item.num===1?' gold':''}" onclick="${item.id?`openPostDetail('${item.id}')`:''}">
+      <div class="rank-num">${item.num}</div>
+      <div class="rank-thumb">
+        ${item.img ? `<img src="${item.img}" loading="lazy">` : '<span>🔧</span>'}
+      </div>
+      <div class="rank-info">
+        <div class="rank-name">${item.name}</div>
+        <div class="rank-user">${item.sub}</div>
+      </div>
+      <div class="rank-right">
+        <div class="rank-gp">${item.score}</div>
+        <div class="rank-gp-label">${item.label}</div>
+      </div>
+    </div>`).join('') || '<div class="feed-empty">No data yet</div>';
+}
+
+// ── PROFILE v2 ─────────────────────────────────────────
+const BADGES_DEF = [
+  {key:'first', req:1,  icon:'🌍', name:'First Global Like',  desc:'海外から初めて評価された'},
+  {key:'b5',    req:5,  icon:'🌎', name:'5 Countries',        desc:'5カ国から評価された'},
+  {key:'b10',   req:10, icon:'🌏', name:'10 Countries',       desc:'10カ国から評価された'},
+  {key:'b20',   req:20, icon:'🏆', name:'World Builder',      desc:'20カ国から評価された'},
+  {key:'b50',   req:50, icon:'🌐', name:'Planet Builder',     desc:'50カ国から評価された'},
+  {key:'b100',  req:100,icon:'⭐', name:'Legendary Builder',  desc:'100カ国から評価された'},
+];
+
+async function renderProfile(){
+  if(!currentUser||!db) return;
+  userData = await loadUserData(currentUser.uid);
+  if(!userData) return;
+
+  document.getElementById('profileNotLoggedIn').style.display = 'none';
+  document.getElementById('profileLoggedIn').style.display   = '';
+
+  // ① HEADER
+  document.getElementById('profileAvatar').innerHTML = userData.photoURL
+    ? `<img src="${userData.photoURL}">` : '👤';
+  document.getElementById('profileName').textContent   = userData.displayName||'Builder';
+  document.getElementById('profileHandle').textContent = '@'+(userData.displayName||'builder').toLowerCase().replace(/\s+/g,'_');
+  document.getElementById('profileBio').textContent    = userData.bio||'';
+  document.getElementById('profCountryFlag').textContent = getCountryFlag(userData.country||'JP');
+
+  // Style chips from bio keywords
+  const styleTags = ['Weathering','Kitbash','Diorama','Custom','Scratch','Painting','Airbrush','Panel Line','LED','Decal'];
+  const bio = (userData.bio||'').toLowerCase();
+  const matched = styleTags.filter(s=>bio.includes(s.toLowerCase()));
+  document.getElementById('profStyles').innerHTML = matched.map(s=>
+    `<span class="prof-style-chip">${s}</span>`).join('');
+
+  // My posts
+  const q = query(collection(db,'posts'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  const myPosts = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const totalGP = myPosts.reduce((s,p)=>s+(p.gp||0),0);
+
+  // Collect all flags + counts per country
+  const flagCounts = {};
+  myPosts.forEach(p => {
+    Object.entries(p.flagsFrom||{}).forEach(([code,cnt])=>{
+      flagCounts[code] = (flagCounts[code]||0) + cnt;
+    });
+  });
+  const uniqueFlags = Object.keys(flagCounts);
+  const flagsSorted = Object.entries(flagCounts).sort((a,b)=>b[1]-a[1]);
+
+  // ② STATUS BAR
+  document.getElementById('pstatGP').textContent       = totalGP >= 1000 ? (totalGP/1000).toFixed(1)+'K' : totalGP;
+  document.getElementById('pstatWorks').textContent    = myPosts.length;
+  document.getElementById('pstatFollowers').textContent = '—';
+  document.getElementById('pstatCountries').textContent = uniqueFlags.length;
+  document.getElementById('pstatBuildsCount').textContent = ` (${myPosts.length})`;
+
+  // Rank
+  if(db){
+    try {
+      const allSnap = await getDocs(query(collection(db,'posts'), orderBy('gp','desc'), limit(200)));
+      const allPosts = allSnap.docs.map(d=>d.data());
+      const builderGP = {};
+      allPosts.forEach(p=>{ builderGP[p.uid]=(builderGP[p.uid]||0)+(p.gp||0); });
+      const sorted = Object.entries(builderGP).sort((a,b)=>b[1]-a[1]);
+      const gr = sorted.findIndex(([uid])=>uid===currentUser.uid)+1;
+      const grText = gr>0 ? `#${gr}` : '#—';
+      document.getElementById('profGlobalRank').textContent  = grText;
+      document.getElementById('profGlobalRank2').textContent = grText;
+      const myCountry = userData.country||'JP';
+      const countryGP = {};
+      allPosts.filter(p=>p.country===myCountry).forEach(p=>{ countryGP[p.uid]=(countryGP[p.uid]||0)+(p.gp||0); });
+      const crSorted = Object.entries(countryGP).sort((a,b)=>b[1]-a[1]);
+      const cr = crSorted.findIndex(([uid])=>uid===currentUser.uid)+1;
+      const crText = cr>0 ? `#${cr}` : '#—';
+      document.getElementById('profCountryRank').textContent  = crText;
+      document.getElementById('profCountryRank2').textContent = crText;
+    } catch(e){}
+  }
+
+  // ③ GLOBAL EVALUATION
+  document.getElementById('profLikedIn').textContent = uniqueFlags.length;
+  // Flag strip (scrollable, with count)
+  document.getElementById('profFlagStrip').innerHTML = flagsSorted.slice(0,20).map(([code,cnt])=>
+    `<div class="prof-flag-btn" title="${getCountryName(code)}: ${cnt} flags">
+      <span>${getCountryFlag(code)}</span>
+      <span class="prof-flag-cnt">${cnt}</span>
+    </div>`
+  ).join('') || '<span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Post builds to collect flags!</span>';
+  // Bar chart detail
+  const maxCnt = flagsSorted[0]?.[1]||1;
+  document.getElementById('flagBarList').innerHTML = flagsSorted.slice(0,15).map(([code,cnt])=>
+    `<div class="prof-flag-bar-row">
+      <span class="prof-flag-bar-flag">${getCountryFlag(code)}</span>
+      <span class="prof-flag-bar-name">${getCountryName(code)}</span>
+      <div class="prof-flag-bar-track">
+        <div class="prof-flag-bar-fill" style="width:${Math.round(cnt/maxCnt*100)}%"></div>
+      </div>
+      <span class="prof-flag-bar-num">${cnt}</span>
+    </div>`
+  ).join('');
+
+  // ④ BADGES
+  document.getElementById('profBadges').innerHTML = BADGES_DEF.map(b=>{
+    const unlocked = uniqueFlags.length >= b.req;
+    return `<div class="prof-badge-card${unlocked?' unlocked':' locked'}">
+      <div class="prof-badge-icon">${b.icon}</div>
+      <div class="prof-badge-name">${b.name}</div>
+      <div class="prof-badge-req">${b.req}</div>
+    </div>`;
+  }).join('');
+
+  // ⑤ FEATURED BUILD (highest GP)
+  const sorted = [...myPosts].sort((a,b)=>(b.gp||0)-(a.gp||0));
+  const featured = sorted[0];
+  if(featured){
+    const fFlags = Object.keys(featured.flagsFrom||{});
+    document.getElementById('profFeatured').innerHTML = `
+      <div class="featured-v3" onclick="openPostDetail('${featured.id}')">
+        ${featured.imageURL
+          ? `<img class="featured-v3-img" src="${featured.imageURL}" loading="lazy">`
+          : `<div class="featured-v3-img-placeholder">🔧</div>`}
+        <div class="featured-v3-body">
+          <div class="featured-v3-label">🔥 FEATURED BUILD</div>
+          <div class="featured-v3-title">${featured.title}</div>
+          <div class="featured-v3-stats">
+            <div class="featured-v3-stat">⚡ <strong>${(featured.gp||0).toLocaleString()}</strong> Gpoints</div>
+            <div class="featured-v3-stat">🌍 <strong>${fFlags.length}</strong> Countries</div>
+            ${featured.scale?`<div class="featured-v3-stat">📐 ${featured.scale}</div>`:''}
+          </div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('profFeatured').innerHTML =
+      `<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);padding:8px 0">Post your first build to feature it here!</div>`;
+  }
+
+  // ⑥ BUILDS GRID
+  document.getElementById('ptab-builds').innerHTML = myPosts.length
+    ? myPosts.map(p=>`
+      <div class="build-thumb-v3" onclick="openPostDetail('${p.id}')">
+        ${p.imageURL
+          ? `<img src="${p.imageURL}" loading="lazy">`
+          : `<div class="build-thumb-v3-empty">🔧</div>`}
+        <div class="build-thumb-v3-overlay">
+          <span>⚡${p.gp||0}</span>
+          <span>🌍${Object.keys(p.flagsFrom||{}).length}</span>
+        </div>
+      </div>`).join('')
+    : `<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);padding:20px 0;grid-column:1/-1">No builds yet — post your first!</div>`;
+
+  // ⑦ COMMUNITY
+  document.getElementById('profGivenGP').textContent         = userData.gpGiven||0;
+  document.getElementById('profFlagsGiven').textContent      = userData.flagsGiven||0;
+  document.getElementById('profCountriesSupported').textContent = userData.countriesSupported||0;
+
+  // Cache for share modal
+  window._profileCache = { myPosts, uniqueFlags, flagsSorted, totalGP, userData };
+}
+
+// Toggle flag detail panel
+window.toggleFlagDetail = function(){
+  const panel  = document.getElementById('flagDetailPanel');
+  const toggle = document.getElementById('flagDetailToggle');
+  const isOpen = panel.classList.toggle('open');
+  toggle.textContent = isOpen ? '▲ CLOSE' : '▼ DETAILS';
+}
+
+
+// ── SHARE FUNCTIONS ──────────────────────────────────
+window.openShareModal = function(){
+  const cache = window._profileCache;
+  if(!cache){ toast('プロフィールを読み込んでください'); return; }
+  const { uniqueFlags, totalGP, userData: ud } = cache;
+
+  // Flag emojis (top 8)
+  const topFlags = uniqueFlags.slice(0,8).map(getCountryFlag).join(' ');
+  document.getElementById('shareCardFlags').textContent = topFlags || '—';
+  document.getElementById('shareCardCount').textContent = uniqueFlags.length;
+
+  // Hashtags
+  const allTags = (cache.myPosts||[]).flatMap(p=>p.tags||[]).slice(0,3);
+  const hashtags = ['#PLAMOX','#Gunpla',...allTags.map(t=>`#${t}`)].slice(0,5).join(' ');
+  document.getElementById('shareCardHashtags').textContent = hashtags;
+
+  // Copy text
+  const copyText = `🌍 My Build Got Likes From\n${topFlags}\n${uniqueFlags.length} Countries\n\nMy build got likes from ${uniqueFlags.length} countries 🌍\n${hashtags}\nhttps://tk6o1.github.io/plamox/`;
+  document.getElementById('shareCopyText').textContent = copyText;
+  window._shareText = copyText;
+
+  // Unlocked achievements
+  const unlockedBadges = BADGES_DEF.filter(b => uniqueFlags.length >= b.req);
+  document.getElementById('shareAchievements').innerHTML = unlockedBadges.map(b=>`
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid rgba(255,200,64,0.3);padding:6px 10px;clip-path:var(--clip-sm)">
+      <span style="font-size:16px">${b.icon}</span>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--gold)">${b.name}</span>
+      <button onclick="shareAchievement('${b.name}','${b.icon}',${b.req})" style="background:transparent;border:none;cursor:pointer;color:var(--accent);font-size:10px;margin-left:4px">シェア</button>
+    </div>`).join('') || '<span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">実績を解除するとここに表示されます</span>';
+
+  openModal('shareModal');
+}
+
+window.copyShareText = function(){
+  if(navigator.clipboard && window._shareText){
+    navigator.clipboard.writeText(window._shareText).then(()=>toast('📋 コピーしました！'));
+  } else {
+    // Fallback
+    const el = document.getElementById('shareCopyText');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    toast('📋 コピーしました！');
+  }
+}
+
+window.shareToTwitter = function(){
+  const cache = window._profileCache;
+  if(!cache) return;
+  const { uniqueFlags } = cache;
+  const topFlags = uniqueFlags.slice(0,5).map(getCountryFlag).join('');
+  const text = encodeURIComponent(
+    `My build got likes from ${uniqueFlags.length} countries 🌍 ${topFlags}\n#PLAMOX #Gunpla\nhttps://tk6o1.github.io/plamox/`
+  );
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+}
+
+window.shareAchievement = function(name, icon, req){
+  const text = encodeURIComponent(
+    `${icon} Unlocked "${name}" on PLAMOX!\nLiked in ${req}+ countries 🌍\n#PLAMOX #Gunpla\nhttps://tk6o1.github.io/plamox/`
+  );
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+}
+
+// legacy stub (no longer used but keep to avoid errors)
+window.setPTab = function(tab, el){}
+
+
+// ── EDIT PROFILE ──────────────────────────────────────
+function buildCountrySelect(){
+  const sel = document.getElementById('editCountry');
+  sel.innerHTML = COUNTRIES.map(c=>`<option value="${c.code}">${c.flag} ${c.name}</option>`).join('');
+}
+
+window.saveProfile = async function(){
+  if(!currentUser||!db) return;
+  const name    = document.getElementById('editName').value.trim();
+  const bio     = document.getElementById('editBio').value.trim();
+  const country = document.getElementById('editCountry').value;
+  const errEl   = document.getElementById('editProfileError');
+  if(!name){ errEl.textContent = 'Name is required'; return; }
+  try {
+    await updateDoc(doc(db,'users',currentUser.uid),{ displayName:name, bio, country });
+    await updateProfile(currentUser,{ displayName:name });
+    userData = await loadUserData(currentUser.uid);
+    closeModal('editProfileModal');
+    renderProfile();
+    toast(T('profile_updated'));
+  } catch(e){ errEl.textContent = e.message; }
+}
+
+// Open edit profile — prefill
+const _origOpenModal = window.openModal;
+window.openModal = function(id){
+  if(id==='editProfileModal' && userData){
+    document.getElementById('editName').value    = userData.displayName||'';
+    document.getElementById('editBio').value     = userData.bio||'';
+    buildCountrySelect();
+    document.getElementById('editCountry').value = userData.country||'JP';
+  }
+  document.getElementById(id).classList.add('open');
+}
+
+// ── DEMO MODE ─────────────────────────────────────────
+function renderDemoFeed(){
+  const demoPosts = [
+    {id:'d1',displayName:'tanaka_builds',country:'JP',title:'RX-78 DEEP CHROME CUSTOM',category:'gunpla',scale:'MG',desc:'全塗装。クロームシルバーにブルーパープルを重ねたオリジナルカラー。',point:'アイセンサー部の自作エッチング加工',gp:847,imageURL:'',flagsFrom:{US:12,KR:8,DE:5,FR:4,CN:7},createdAt:null,tags:['custom','chrome']},
+    {id:'d2',displayName:'lionartworks',country:'US',title:'JUNGLE DIORAMA',category:'diorama',scale:'1/35',desc:'Vietnam War era diorama with 40+ hand-painted figures.',point:'Each leaf was individually sculpted and painted',gp:312,imageURL:'',flagsFrom:{JP:15,KR:3,GB:6},createdAt:null,tags:['diorama','ww2']},
+    {id:'d3',displayName:'kimsculpt',country:'KR',title:'COSMIC STRIKER',category:'sci-fi',scale:'HG',desc:'오리지널 컬러 도장 + 자작 LED 내장',point:'내부 LED의 은하 패턴 조명',gp:589,imageURL:'',flagsFrom:{JP:20,US:11,CN:5},createdAt:null,tags:['LED','custom']},
+  ];
+  renderFeed(demoPosts);
+  updateStats(demoPosts);
+  renderSidebarCountries(demoPosts);
+  renderSidebarBuilders(demoPosts);
+}
+
+function renderDemoRanking(){
+  renderRanking([
+    {id:'d1',title:'RX-78 DEEP CHROME CUSTOM',displayName:'tanaka_builds',country:'JP',gp:847,flagsFrom:{US:12,KR:8}},
+    {id:'d3',title:'COSMIC STRIKER',displayName:'kimsculpt',country:'KR',gp:589,flagsFrom:{JP:20}},
+    {id:'d2',title:'JUNGLE DIORAMA',displayName:'lionartworks',country:'US',gp:312,flagsFrom:{JP:15}},
+  ]);
+}
+
+// ── PAGE ROUTING ──────────────────────────────────────
+window.showPage = function(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const nl = document.getElementById('nl-'+page);
+  if(nl) nl.classList.add('active');
+  if(page==='ranking') loadRanking();
+  if(page==='profile') renderProfile();
+}
+
+window.mnActive = function(id){
+  document.querySelectorAll('.mobile-nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────
+window.closeModal = function(id){
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if(e.target===overlay) overlay.classList.remove('open');
+  });
+});
+
+// ── AUTH TAB ──────────────────────────────────────────
+window.setAuthTab = function(tab){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('loginForm').style.display  = tab==='login'  ? '' : 'none';
+  document.getElementById('signupForm').style.display = tab==='signup' ? '' : 'none';
+}
+
+// ── HERO FLAGS ────────────────────────────────────────
+function initHeroFlags(){
+  const flags = ['🇯🇵','🇺🇸','🇰🇷','🇨🇳','🇩🇪','🇫🇷','🇧🇷','🇮🇩','🇮🇳','🇦🇺','🇬🇧','🇮🇹'];
+  document.getElementById('heroFlags').innerHTML = flags.map(f=>`<div class="hero-flag">${f}</div>`).join('');
+}
+
+// ── TOAST ─────────────────────────────────────────────
+window.toast = function(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── CLOSE LANG ON OUTSIDE CLICK ───────────────────────
+document.addEventListener('click', e=>{
+  if(!document.getElementById('langSwitcher').contains(e.target))
+    document.getElementById('langSwitcher').classList.remove('open');
+});
+
+// ── INIT ──────────────────────────────────────────────
+buildLangDropdown();
+applyLang();
+initHeroFlags();
+loadFeed();
+
+</script>
+</body>
+</html>
